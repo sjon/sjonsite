@@ -11,7 +11,7 @@
 	require_once '../include/config.php';
 
 	/**
-	 *
+	 * Class SjonSite_FrontendController
 	 */
 	final class SjonSite_FrontendController extends SjonSite_Main implements SjonSite_Controller {
 

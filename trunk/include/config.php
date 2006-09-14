@@ -13,6 +13,6 @@
 	define ('SJONSITE_BASE', dirname(__FILE__));
 	define ('SJONSITE_VAR', realpath(SJONSITE_BASE . '/../var'));
 
-	require_once SJONSITE_BASE . '/library.php');
+	require_once SJONSITE_BASE . '/library.php';
 
 ?>
