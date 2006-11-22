@@ -10,9 +10,9 @@
 
 	define ('SJONSITE_URL', '');
 	define ('SJONSITE_DSN', '');
-	define ('SJONSITE_BASE', dirname(__FILE__));
-	define ('SJONSITE_VAR', realpath(SJONSITE_BASE . '/../var'));
+	define ('SJONSITE_BASE', dirname(dirname(__FILE__)));
+	define ('SJONSITE_VAR', realpath(SJONSITE_BASE . '/var'));
 
-	require_once SJONSITE_BASE . '/library.php';
+	require_once SJONSITE_BASE . '/include/library.php';
 
 ?>
