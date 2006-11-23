@@ -22,7 +22,30 @@
 		public function close () {}
 		public function error () {}
 		public function escape () {}
-		public function quote () {}
+
+		/**
+		 * Quote a string, returns a number if string is numeric,
+		 * NULL if string is null, or an escaped string enclosed in quotes
+		 *
+		 * @param string $string
+		 * @param mixed $default
+		 * @return string
+		 */
+		function quote ($string) {
+			if (is_numeric($string)) {
+				return (strpos($string, '.') !== false ? (float) $string : (int) $string);
+			}
+			elseif (is_null($string)) {
+				return 'NULL';
+			}
+			elseif ($string == 'NOW()') {
+				return 'NOW()';
+			}
+			else {
+				return '\'' . mysql_real_escape_string($string) . '\'';
+			}
+		}
+
 		public function query () {}
 		public function fetch () {}
 		public function free () {}

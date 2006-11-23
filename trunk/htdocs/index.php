@@ -11,10 +11,23 @@
 	require_once '../include/config.php';
 
 	/**
-	 * Class SjonSite_FrontendController
+	 * Class sjonsite_main
 	 */
-	final class SjonSite_FrontendController extends SjonSite_Main implements SjonSite_Controller {
+	final class sjonsite_main extends sjonsite implements sjonsite_controller {
+
+		public function __construct () {
+			parent::__construct('/');
+		}
+
+		function handleEvent () {
+
+		}
 
 	}
+
+	/**
+	 * Run
+	 */
+	sjonsite::run('main');
 
 ?>

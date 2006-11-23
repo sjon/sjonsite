@@ -8,8 +8,6 @@
 	 * @version $Id$
 	 */
 
-	require_once SJONSITE_BASE . '/include/db.php';
-
 	/**
 	 * Class sjonsite_model
 	 */
