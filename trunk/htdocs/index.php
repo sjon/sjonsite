@@ -11,16 +11,31 @@
 	require_once '../include/config.php';
 
 	/**
-	 * Class sjonsite_main
+	 * Class Sjonsite_Main
 	 */
-	final class sjonsite_main extends sjonsite implements sjonsite_controller {
+	final class Sjonsite_Main extends Sjonsite implements SjonsiteController {
 
 		public function __construct () {
-			parent::__construct('/');
+			parent::__construct(array(
+				'dsn' => 'mysql://username:password@localhost:3306/database?persistent=true',
+				'upi' => false,
+			));
 		}
 
-		function handleEvent () {
+		/**
+		 * Contact Event
+		 *
+		 * @return void
+		 */
+		public function handleContactEvent () {
+		}
 
+		/**
+		 * Default Event
+		 *
+		 * @return void
+		 */
+		public function handleDefaultEvent () {
 		}
 
 	}
@@ -28,6 +43,6 @@
 	/**
 	 * Run
 	 */
-	sjonsite::run('main');
+	Sjonsite::run('main');
 
 ?>
