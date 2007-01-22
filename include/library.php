@@ -11,40 +11,39 @@
 	/**
 	 * @todo integrate db and model into library.php lateron
 	 */
-	sjonsite_cfg::load('db');
-	sjonsite_cfg::load('model');
+	SjonsiteConfig::load('db');
+	SjonsiteConfig::load('model');
 
 	/**
 	 * Class sjonsite
 	 */
-	class sjonsite {
+	class Sjonsite {
 
 		/**
 		 * @var sjonsite_cfg
 		 */
-		public $cfg;
+		protected $cfg;
 
 		/**
 		 * @var sjonsite_db
 		 */
-		public $db;
+		protected $db;
 
 		/**
 		 * @var sjonsite_io
 		 */
-		public $io;
+		protected $io;
 
 		/**
 		 * Constructor
 		 *
-		 * @param string $base_uri
+		 * @param array $config
 		 * @return sjonsite
 		 */
-		public function __construct ($base_uri) {
-			$this->cfg = new sjonsite_cfg($base_uri);
-			$this->db = new sjonsite_db();
-			$this->io = new sjonsite_io();
-			$this->base_uri = $base_uri;
+		public function __construct (array $config) {
+			$this->cfg = new SjonsiteConfig($config);
+			$this->db = new SjonsiteDB();
+			$this->io = new SjonsiteIO();
 		}
 
 		/**
@@ -52,19 +51,47 @@
 		 *
 		 * @param string $suffix
 		 * @return void
+		 * @throws Exception when $suffix is not a valid class or does not implement controller
 		 */
-		function run ($suffix) {
-			$classname = 'sjonsite_' . $suffix;
-			$cp = new $classname();
-			$cp->handleEvent();
+		public static function run ($suffix) {
+			$classname = 'Sjonsite_' . ucfirst(strtolower($suffix));
+			if (class_exists($classname, false)) {
+				$cp = new $classname();
+				if ($cp instanceof SjonsiteController) {
+					$cp->handleEvent();
+				}
+				else {
+					throw new SjonsiteException($suffix . ' is not a valid controller');
+				}
+			}
+			else {
+				throw new SjonsiteException($suffix . ' is not a valid class');
+			}
+		}
+
+		/**
+		 * Default event handler
+		 *
+		 * Runs the handleXyzEvent method, where Xyz is the value of the cmd argument
+		 * Defaults to handleDefaultEvent if an invalid or no cmd is given.
+		 *
+		 * @return void
+		 */
+		public function handleEvent () {
+			$cmd = ucfirst(strtolower(preg_replace('#[^a-z]#', '', $this->io->param('cmd'))));
+			$method = 'handleDefaultEvent';
+			if ($cmd && method_exists($this, 'handle' . $cmd . 'Event')) {
+				$method = 'handle' . $cmd . 'Event';
+			}
+			call_user_func(array($this, $method));
 		}
 
 	}
 
 	/**
-	 * Class sjonsite_io
+	 * Class SjonsiteIO
 	 */
-	class sjonsite_io {
+	class SjonsiteIO {
 
 		/**
 		 * Fetch an input argument's value
@@ -76,7 +103,7 @@
 		public function param ($name, $default = null) {
 			$value = (isset($_POST[$name]) ? $_POST[$name] : (isset($_GET[$name]) ? $_GET[$name] : null));
 			if (!is_null($value) && get_magic_quotes_gpc()) {
-				(is_array($value) ? array_walk($value, array('sjonsite_io', 'param_stripslashes')) : sjonsite_io::param_stripslashes($value));
+				(is_array($value) ? array_walk($value, array('SjonsiteIO', 'param_stripslashes')) : SjonsiteIO::param_stripslashes($value));
 			}
 			return (is_null($value) ? $default : ($value === 'null' ? null : ($value === 'true' ? true : ($value === 'false' ? false : $value))));
 		}
@@ -148,13 +175,13 @@
 					'@' => ' at ', '&' => ' and '
 				);
 			}
-			if ($options & sjonsite_io::NORM_ACCENTS) {
+			if ($options & SjonsiteIO::NORM_ACCENTS) {
 				$string = strtr($string, $chars);
 			}
-			if ($options & sjonsite_io::NORM_TOLOWER) {
+			if ($options & SjonsiteIO::NORM_TOLOWER) {
 				$string = trim(strtolower($string));
 			}
-			if ($options & sjonsite_io::NORM_SPACETODASH) {
+			if ($options & SjonsiteIO::NORM_SPACETODASH) {
 				$string = preg_replace(array('#([^A-Za-z0-9\+\-\.\,\=]+)#U', '#--+#', '#-\.#', '#\.-#', '#^([-]+)([^-]*)#', '#(.*)([-]+)$#'), array('-', '-', '.', '.', '$2', '$1'), $string);
 				if ($string && substr($string, -1) == '-') $string = substr($string, 0, -1);
 			}
@@ -168,7 +195,7 @@
 		 * @param int $length
 		 * @return string
 		 */
-		function cutoff ($string, $length = 80) {
+		public function cutoff ($string, $length = 80) {
 			if (strlen($string) > $length) {
 				$tmp = explode(' ', $string);
 				$rv = array();
@@ -311,9 +338,9 @@
 	}
 
 	/**
-	 * Interface sjonsite_controller
+	 * Interface SjonsiteController
 	 */
-	interface sjonsite_controller {
+	interface SjonsiteController {
 
 		/**
 		 * Default Event Handler
@@ -321,7 +348,7 @@
 		 * @abstract
 		 * @return mixed
 		 */
-		public abstract function handleEvent();
+		public abstract function handleDefaultEvent();
 
 	}
 
