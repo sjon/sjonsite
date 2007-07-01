@@ -19,15 +19,25 @@
 	if (!defined('SJONSITE_CACHE')) define ('SJONSITE_CACHE', SJONSITE_VAR . '/cache');
 	if (!defined('SJONSITE_TEMPLATE')) define ('SJONSITE_TEMPLATE', SJONSITE_VAR . '/template');
 
+	/**
+	 * Check PDO Configuration
+	 */
 	if (!defined('SJONSITE_PDO_DSN')) define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonsite');
 	if (!defined('SJONSITE_PDO_USER')) define ('SJONSITE_PDO_USER', 'username');
 	if (!defined('SJONSITE_PDO_PASS')) define ('SJONSITE_PDO_PASS', 'password');
+	if (!defined('SJONSITE_PDO_PERSISTENT')) define ('SJONSITE_PDO_PERSISTENT', false);
 	if (!defined('SJONSITE_PREFIX')) define ('SJONSITE_PREFIX', 'v1_');
 
+	/**
+	 * Set starting time and check current environment
+	 */
 	define ('SJONSITE_START', microtime(true));
 	define ('SJONSITE_TIMEZONE', 'Europe/Amsterdam');
-	// check for php5 (duh), no magic quotes, mysql5?, required extensions, etc.
-	if (get_magic_quotes_gpc()) {}
+	if (version_compare(phpversion(), '5.2', '<')) exit('You are not running PHP 5.2 or higher.');
+	if (get_magic_quotes_gpc()) exit('You should disable magic quotes, they\'re evil.');
+	if (class_exists('PDO', false)) exit('You don\'t have the PDO extension enabled.');
+	// we only support mysql for now.
+	if (!in_array('mysql', PDO::getAvailableDrivers())) exit('You don\'t have the PDO_mysql extension enabled.');
 
 	/**
 	 * Class Sjonsite
@@ -140,7 +150,7 @@
 			$this->db = null;
 			$this->ex = array();
 			try {
-				$this->db = new PDO(CINSYS_DSN, CINSYS_DSN_USR, CINSYS_DSN_PWD, array(PDO::ATTR_PERSISTENT => false));
+				$this->db = new PDO(SJONSITE_PDO_DSN, SJONSITE_PDO_USER, SJONSITE_PDO_PASS, array(PDO::ATTR_PERSISTENT => SJONSITE_PDO_PERSISTENT));
 				$this->db->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
 				$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 				$this->db->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_NATURAL);
@@ -437,6 +447,37 @@
 	}
 
 	/**
+	 * Class Sjonsite_Management
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
+	 */
+	abstract class Sjonsite_Management extends Sjonsite {
+
+		/**
+		 * Constructor
+		 *
+		 * @param array $resource
+		 */
+		public function __construct ($resource) {
+			parent::__construct($resource, 'checkAuth');
+		}
+
+		/**
+		 * Check Authentication
+		 *
+		 * @return string
+		 */
+		public function checkAuth () {
+			if (empty($_SESSION['auth'])) {
+				return 'management-login';
+			}
+			return false;
+		}
+
+	}
+
+	/**
 	 * Class Sjonsite_Model
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
@@ -495,36 +536,22 @@
 
 	}
 
-
 	/**
-	 * Class Sjonsite_Management
+	 * Interface Sjonsite_Model
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
 	 * @copyright Sjon's dotCom 2007
 	 */
-	abstract class Sjonsite_Management extends Sjonsite {
+	interface Sjonsite_Filter {
+	}
 
-		/**
-		 * Constructor
-		 *
-		 * @param array $resource
-		 */
-		public function __construct ($resource) {
-			parent::__construct($resource, 'checkAuth');
-		}
-
-		/**
-		 * Check Authentication
-		 *
-		 * @return string
-		 */
-		public function checkAuth () {
-			if (empty($_SESSION['auth'])) {
-				return 'management-login';
-			}
-			return false;
-		}
-
+	/**
+	 * Interface Sjonsite_Model
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
+	 */
+	interface Sjonsite_Filter_Config {
 	}
 
 ?>
