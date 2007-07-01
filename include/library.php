@@ -4,130 +4,73 @@
 	 * SjonSite - Library
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
-	 * @package SjonSite
+	 * @package Sjonsite
+	 * @copyright Sjon's dotCom 2007
 	 * @version $Id$
 	 */
 
 	/**
-	 * @todo integrate db and model into library.php lateron
+	 * Check Configuration
 	 */
-	SjonsiteConfig::load('db');
-	SjonsiteConfig::load('model');
+	if (!defined('SJONSITE_ROOT')) define ('SJONSITE_ROOT', dirname(dirname(__FILE__)));
+	if (!defined('SJONSITE_HTDOCS')) define ('SJONSITE_HTDOCS', SJONSITE_ROOT . '/htdocs');
+	if (!defined('SJONSITE_INCLUDE')) define ('SJONSITE_INCLUDE', SJONSITE_ROOT . '/include');
+	if (!defined('SJONSITE_VAR')) define ('SJONSITE_VAR', SJONSITE_ROOT . '/var');
+	if (!defined('SJONSITE_CACHE')) define ('SJONSITE_CACHE', SJONSITE_VAR . '/cache');
+	if (!defined('SJONSITE_TEMPLATE')) define ('SJONSITE_TEMPLATE', SJONSITE_VAR . '/template');
+
+	if (!defined('SJONSITE_PDO_DSN')) define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonsite');
+	if (!defined('SJONSITE_PDO_USER')) define ('SJONSITE_PDO_USER', 'username');
+	if (!defined('SJONSITE_PDO_PASS')) define ('SJONSITE_PDO_PASS', 'password');
+	if (!defined('SJONSITE_PREFIX')) define ('SJONSITE_PREFIX', 'v1_');
+
+	define ('SJONSITE_START', microtime(true));
+	define ('SJONSITE_TIMEZONE', 'Europe/Amsterdam');
+	// check for php5 (duh), no magic quotes, mysql5?, required extensions, etc.
+	if (get_magic_quotes_gpc()) {}
 
 	/**
-	 * Class sjonsite
+	 * Class Sjonsite
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
 	 */
-	class Sjonsite {
+	abstract class Sjonsite {
 
 		/**
-		 * @var sjonsite_cfg
+		 * Constant for the status enums
 		 */
-		protected $cfg;
+		const ACTIVE = 'A';
 
 		/**
-		 * @var sjonsite_db
+		 * Constant for the status enums
 		 */
-		protected $db;
+		const HIDDEN = 'H';
 
 		/**
-		 * @var sjonsite_io
+		 * Constant for the status enums
 		 */
-		protected $io;
+		const SUSPEND = 'S';
 
 		/**
-		 * Constructor
-		 *
-		 * @param array $config
-		 * @return sjonsite
+		 * Constant for the status enums
 		 */
-		public function __construct (array $config) {
-			$this->cfg = new SjonsiteConfig($config);
-			$this->db = new SjonsiteDB();
-			$this->io = new SjonsiteIO();
-		}
+		const REMOVED = 'R';
 
 		/**
-		 * Run a frontend controller
-		 *
-		 * @param string $suffix
-		 * @return void
-		 * @throws Exception when $suffix is not a valid class or does not implement controller
+		 * Constant for the status enums
 		 */
-		public static function run ($suffix) {
-			$classname = 'Sjonsite_' . ucfirst(strtolower($suffix));
-			if (class_exists($classname, false)) {
-				$cp = new $classname();
-				if ($cp instanceof SjonsiteController) {
-					$cp->handleEvent();
-				}
-				else {
-					throw new SjonsiteException($suffix . ' is not a valid controller');
-				}
-			}
-			else {
-				throw new SjonsiteException($suffix . ' is not a valid class');
-			}
-		}
+		const UNKNOWN = 'U';
 
 		/**
-		 * Default event handler
-		 *
-		 * Runs the handleXyzEvent method, where Xyz is the value of the cmd argument
-		 * Defaults to handleDefaultEvent if an invalid or no cmd is given.
-		 *
-		 * @return void
+		 * Constant for the boolean enums
 		 */
-		public function handleEvent () {
-			$cmd = ucfirst(strtolower(preg_replace('#[^a-z]#', '', $this->io->param('cmd'))));
-			$method = 'handleDefaultEvent';
-			if ($cmd && method_exists($this, 'handle' . $cmd . 'Event')) {
-				$method = 'handle' . $cmd . 'Event';
-			}
-			call_user_func(array($this, $method));
-		}
-
-	}
-
-	/**
-	 * Class SjonsiteIO
-	 */
-	class SjonsiteIO {
+		const YES = 'Y';
 
 		/**
-		 * Fetch an input argument's value
-		 *
-		 * @param string $name
-		 * @param mixed $default
-		 * @return mixed
+		 * Constant for the boolean enums
 		 */
-		public function param ($name, $default = null) {
-			$value = (isset($_POST[$name]) ? $_POST[$name] : (isset($_GET[$name]) ? $_GET[$name] : null));
-			if (!is_null($value) && get_magic_quotes_gpc()) {
-				(is_array($value) ? array_walk($value, array('SjonsiteIO', 'param_stripslashes')) : SjonsiteIO::param_stripslashes($value));
-			}
-			return (is_null($value) ? $default : ($value === 'null' ? null : ($value === 'true' ? true : ($value === 'false' ? false : $value))));
-		}
-
-		/**
-		 * Stripslashes
-		 *
-		 * @access private
-		 * @param string $value
-		 * @param string $key
-		 */
-		private static function param_stripslashes (&$value, $key = null) {
-			$value = stripslashes($value);
-		}
-
-		/**
-		 * Return an htmlentities string
-		 *
-		 * @param string $string
-		 * @return string
-		 */
-		public function entities ($string) {
-			return htmlentities($string, ENT_QUOTES, 'utf-8');
-		}
+		const NO = 'N';
 
 		/**
 		 * Constant for the normalize() method
@@ -149,43 +92,167 @@
 
 		/**
 		 * Constant for the normalize() method
-		 * Change the string for use in an url
+		 * Make it readable (its vs. it-s)
 		 */
-		const NORM_USEINURL = 7;
+		const NORM_READABLE = 8;
 
 		/**
-		 * Normalize a string
-		 *
-		 * The $chars array bit was kindly ripped from wordpress's functions-formatting.php
-		 * @param string $string
-		 * @param int $options
-		 * @return string
+		 * Constant for the normalize() method
+		 * Change the string for use in an url
 		 */
-		public function normalize ($string, $options = sjonsite_io::NORM_USEINURL) {
-			static $chars;
-			if (empty($chars)) {
-				$chars = array(
-					// Decompositions for Latin-1 Supplement
-					chr(195).chr(128) => 'A', chr(195).chr(129) => 'A', chr(195).chr(130) => 'A', chr(195).chr(131) => 'A', chr(195).chr(132) => 'A', chr(195).chr(133) => 'A', chr(195).chr(135) => 'C', chr(195).chr(136) => 'E', chr(195).chr(137) => 'E', chr(195).chr(138) => 'E', chr(195).chr(139) => 'E', chr(195).chr(140) => 'I', chr(195).chr(141) => 'I', chr(195).chr(142) => 'I', chr(195).chr(143) => 'I', chr(195).chr(145) => 'N', chr(195).chr(146) => 'O', chr(195).chr(147) => 'O', chr(195).chr(148) => 'O', chr(195).chr(149) => 'O', chr(195).chr(150) => 'O', chr(195).chr(153) => 'U', chr(195).chr(154) => 'U', chr(195).chr(155) => 'U', chr(195).chr(156) => 'U', chr(195).chr(157) => 'Y', chr(195).chr(159) => 's', chr(195).chr(160) => 'a', chr(195).chr(161) => 'a', chr(195).chr(162) => 'a', chr(195).chr(163) => 'a', chr(195).chr(164) => 'a', chr(195).chr(165) => 'a', chr(195).chr(167) => 'c', chr(195).chr(168) => 'e', chr(195).chr(169) => 'e', chr(195).chr(170) => 'e', chr(195).chr(171) => 'e', chr(195).chr(172) => 'i', chr(195).chr(173) => 'i', chr(195).chr(174) => 'i', chr(195).chr(175) => 'i', chr(195).chr(177) => 'n', chr(195).chr(178) => 'o', chr(195).chr(179) => 'o', chr(195).chr(180) => 'o', chr(195).chr(181) => 'o', chr(195).chr(182) => 'o', chr(195).chr(182) => 'o', chr(195).chr(185) => 'u', chr(195).chr(186) => 'u', chr(195).chr(187) => 'u', chr(195).chr(188) => 'u', chr(195).chr(189) => 'y', chr(195).chr(191) => 'y',
-					// Decompositions for Latin Extended-A
-					chr(196).chr(128) => 'A', chr(196).chr(129) => 'a', chr(196).chr(130) => 'A', chr(196).chr(131) => 'a', chr(196).chr(132) => 'A', chr(196).chr(133) => 'a', chr(196).chr(134) => 'C', chr(196).chr(135) => 'c', chr(196).chr(136) => 'C', chr(196).chr(137) => 'c', chr(196).chr(138) => 'C', chr(196).chr(139) => 'c', chr(196).chr(140) => 'C', chr(196).chr(141) => 'c', chr(196).chr(142) => 'D', chr(196).chr(143) => 'd', chr(196).chr(144) => 'D', chr(196).chr(145) => 'd', chr(196).chr(146) => 'E', chr(196).chr(147) => 'e', chr(196).chr(148) => 'E', chr(196).chr(149) => 'e', chr(196).chr(150) => 'E', chr(196).chr(151) => 'e', chr(196).chr(152) => 'E', chr(196).chr(153) => 'e', chr(196).chr(154) => 'E', chr(196).chr(155) => 'e', chr(196).chr(156) => 'G', chr(196).chr(157) => 'g', chr(196).chr(158) => 'G', chr(196).chr(159) => 'g', chr(196).chr(160) => 'G', chr(196).chr(161) => 'g', chr(196).chr(162) => 'G', chr(196).chr(163) => 'g', chr(196).chr(164) => 'H', chr(196).chr(165) => 'h', chr(196).chr(166) => 'H', chr(196).chr(167) => 'h', chr(196).chr(168) => 'I', chr(196).chr(169) => 'i', chr(196).chr(170) => 'I', chr(196).chr(171) => 'i', chr(196).chr(172) => 'I', chr(196).chr(173) => 'i', chr(196).chr(174) => 'I', chr(196).chr(175) => 'i', chr(196).chr(176) => 'I', chr(196).chr(177) => 'i', chr(196).chr(178) => 'IJ', chr(196).chr(179) => 'ij', chr(196).chr(180) => 'J', chr(196).chr(181) => 'j', chr(196).chr(182) => 'K', chr(196).chr(183) => 'k', chr(196).chr(184) => 'k', chr(196).chr(185) => 'L', chr(196).chr(186) => 'l', chr(196).chr(187) => 'L', chr(196).chr(188) => 'l', chr(196).chr(189) => 'L', chr(196).chr(190) => 'l', chr(196).chr(191) => 'L', chr(197).chr(128) => 'l', chr(197).chr(129) => 'L', chr(197).chr(130) => 'l', chr(197).chr(131) => 'N', chr(197).chr(132) => 'n', chr(197).chr(133) => 'N', chr(197).chr(134) => 'n', chr(197).chr(135) => 'N', chr(197).chr(136) => 'n', chr(197).chr(137) => 'N', chr(197).chr(138) => 'n', chr(197).chr(139) => 'N', chr(197).chr(140) => 'O', chr(197).chr(141) => 'o', chr(197).chr(142) => 'O', chr(197).chr(143) => 'o', chr(197).chr(144) => 'O', chr(197).chr(145) => 'o', chr(197).chr(146) => 'OE', chr(197).chr(147) => 'oe', chr(197).chr(148) => 'R', chr(197).chr(149) => 'r', chr(197).chr(150) => 'R', chr(197).chr(151) => 'r', chr(197).chr(152) => 'R', chr(197).chr(153) => 'r', chr(197).chr(154) => 'S', chr(197).chr(155) => 's', chr(197).chr(156) => 'S', chr(197).chr(157) => 's', chr(197).chr(158) => 'S', chr(197).chr(159) => 's', chr(197).chr(160) => 'S', chr(197).chr(161) => 's', chr(197).chr(162) => 'T', chr(197).chr(163) => 't', chr(197).chr(164) => 'T', chr(197).chr(165) => 't', chr(197).chr(166) => 'T', chr(197).chr(167) => 't', chr(197).chr(168) => 'U', chr(197).chr(169) => 'u', chr(197).chr(170) => 'U', chr(197).chr(171) => 'u', chr(197).chr(172) => 'U', chr(197).chr(173) => 'u', chr(197).chr(174) => 'U', chr(197).chr(175) => 'u', chr(197).chr(176) => 'U', chr(197).chr(177) => 'u', chr(197).chr(178) => 'U', chr(197).chr(179) => 'u', chr(197).chr(180) => 'W', chr(197).chr(181) => 'w', chr(197).chr(182) => 'Y', chr(197).chr(183) => 'y', chr(197).chr(184) => 'Y', chr(197).chr(185) => 'Z', chr(197).chr(186) => 'z', chr(197).chr(187) => 'Z', chr(197).chr(188) => 'z', chr(197).chr(189) => 'Z', chr(197).chr(190) => 'z', chr(197).chr(191) => 's',
-					// Euro Sign
-					chr(226).chr(130).chr(172) => 'E',
-					// extra: symbol to word
-					'@' => ' at ', '&' => ' and '
-				);
+		const NORM_ALL = 15;
+
+		/**
+		 * Our database pointer
+		 *
+		 * @var PDO
+		 */
+		protected $db;
+
+		/**
+		 * Our exception basket
+		 *
+		 * @var array
+		 */
+		protected $ex;
+
+		/**
+		 * Our request uri, without query string
+		 *
+		 * @var string
+		 */
+		protected $request;
+
+		/**
+		 * Our current resource
+		 *
+		 * @var Sjonsite_ResourceModel
+		 */
+		protected $resource;
+
+		/**
+		 * Constructor
+		 *
+		 * @param Sjonsite_ResourceModel $resource
+		 * @param string $callback
+		 */
+		public function __construct ($resource, $callback = null) {
+			$this->db = null;
+			$this->ex = array();
+			try {
+				$this->db = new PDO(CINSYS_DSN, CINSYS_DSN_USR, CINSYS_DSN_PWD, array(PDO::ATTR_PERSISTENT => false));
+				$this->db->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+				$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				$this->db->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_NATURAL);
 			}
-			if ($options & SjonsiteIO::NORM_ACCENTS) {
-				$string = strtr($string, $chars);
+			catch (Exception $e) {
+				$this->error($e);
+				$this->display('error-template');
+				return;
 			}
-			if ($options & SjonsiteIO::NORM_TOLOWER) {
-				$string = trim(strtolower($string));
+			$this->request = preg_replace('#[^a-z0-9\_\-\/]#', '', strtolower($_SERVER['REQUEST_URI']));
+			if (strpos($this->request, '?') !== false) {
+				$this->request = substr($this->request, 0, strpos($this->request, '?'));
 			}
-			if ($options & SjonsiteIO::NORM_SPACETODASH) {
-				$string = preg_replace(array('#([^A-Za-z0-9\+\-\.\,\=]+)#U', '#--+#', '#-\.#', '#\.-#', '#^([-]+)([^-]*)#', '#(.*)([-]+)$#'), array('-', '-', '.', '.', '$2', '$1'), $string);
-				if ($string && substr($string, -1) == '-') $string = substr($string, 0, -1);
+			$this->resource = $resource;
+			date_default_timezone_set(SJONSITE_TIMEZONE);
+			session_name('Sjonsite');
+			session_start();
+			$cmd = $this->param('cmd');
+			$method = 'handle' . ucfirst(strtolower(preg_replace('#[^a-z]#i', null, $cmd))) . 'Event';
+			if (!method_exists($this, $method)) $method = 'handleDefaultEvent';
+			$template = null;
+			if ($callback && method_exists($this, $callback)) {
+				$template = call_user_func(array($this, $callback));
 			}
-			return $string;
+			if (is_null($template) || $template === false) {
+				$template = call_user_func(array($this, $method));
+			}
+			if ($template && is_string($template)) {
+				if (!ini_get('zlib.output_compression')) ob_start('ob_gzhandler');
+				header('Content-Type: text/html; charset=UTF-8');
+				header('Cache-Control: private, no-cache, no-store, must-revalidate, max-age=0, pre-check=0, post-check=0');
+				header('Pragma: no-cache');
+				header('Expires: ' . gmdate(DATE_RFC1123, 233886300));
+				header('Last-Modified: ' . gmdate(DATE_RFC1123));
+				$this->display($template);
+				ob_flush();
+			}
+			exit();
+		}
+
+		/**
+		 * Display some content
+		 *
+		 * @param string $template
+		 * @return void
+		 */
+		public function display ($template) {
+			$template = preg_replace('#[^a-z0-9\-]#', '', $template);
+			if (!file_exists(SJONSITE_TEMPLATE . '/' . $template . '.php')) {
+				$this->error('Unable to locate template &ldquo;' . $template . '&rdquo;', 1);
+				$template = 'error-template';
+			}
+			$this->template($template);
+		}
+
+		/**
+		 * Interface for variables for displaying
+		 * Set $isnull to true if you want $name to be null
+		 *
+		 * @param string $name
+		 * @param mixed $value
+		 * @param bool $isnull
+		 * @return mixed
+		 */
+		public function displayVar ($name, $value = null, $isnull = false) {
+			static $vars;
+			if (!is_null($value) || $isnull === true) {
+				$vars[$name] = $value;
+			}
+			else {
+				return (array_key_exists($name, $vars) ? $vars[$name] : null);
+			}
+		}
+
+		/**
+		 * Require a template file
+		 *
+		 * @param string $template
+		 * @return void
+		 */
+		private function template ($template) {
+			require SJONSITE_TEMPLATE . '/' . $template . '.php';
+		}
+
+		/**
+		 * Add a non-fatal error to the exception basket
+		 *
+		 * @param string $message
+		 * @param int $code
+		 */
+		public function error ($message, $code = null) {
+			if ($message instanceof Exception) {
+				$this->ex[] = $message;
+			}
+			else {
+				$this->ex[] = new Exception($message, $code);
+			}
+		}
+
+		/**
+		 * Fetch an input argument's value
+		 *
+		 * @param string $name
+		 * @param mixed $default
+		 * @return mixed
+		 */
+		public function param ($name, $default = null) {
+			if (isset($_POST[$name]) || isset($_GET[$name])) {
+				$rv = (isset($_POST[$name]) ? $_POST[$name] : $_GET[$name]);
+				return ($rv === 'null' ? null : ($rv === 'true' ? true : ($rv === 'false' ? false : $rv)));
+			}
+			return $default;
 		}
 
 		/**
@@ -209,111 +276,96 @@
 		}
 
 		/**
-		 * Prints the headers
+		 * Return an htmlentities string
 		 *
-		 * @param string $type
-		 * @param bool $nocache
-		 * @param array $extra
+		 * @param string $string
+		 * @return string
+		 */
+		public function entities ($string) {
+			return htmlentities($string, ENT_QUOTES, 'utf-8');
+		}
+
+		/**
+		 * Normalize a string
+		 *
+		 * The $chars array bit was kindly ripped from wordpress's functions-formatting.php
+		 * @param string $string
+		 * @param int $options
+		 * @return string
+		 */
+		public function normalize ($string, $options = Sjonsite::NORM_ALL) {
+			static $chars, $readable;
+			if (empty($chars)) {
+				$chars = array(
+					// Decompositions for Latin-1 Supplement
+					chr(195).chr(128) => 'A', chr(195).chr(129) => 'A', chr(195).chr(130) => 'A', chr(195).chr(131) => 'A', chr(195).chr(132) => 'A', chr(195).chr(133) => 'A', chr(195).chr(135) => 'C', chr(195).chr(136) => 'E', chr(195).chr(137) => 'E', chr(195).chr(138) => 'E', chr(195).chr(139) => 'E', chr(195).chr(140) => 'I', chr(195).chr(141) => 'I', chr(195).chr(142) => 'I', chr(195).chr(143) => 'I', chr(195).chr(145) => 'N', chr(195).chr(146) => 'O', chr(195).chr(147) => 'O', chr(195).chr(148) => 'O', chr(195).chr(149) => 'O', chr(195).chr(150) => 'O', chr(195).chr(153) => 'U', chr(195).chr(154) => 'U', chr(195).chr(155) => 'U', chr(195).chr(156) => 'U', chr(195).chr(157) => 'Y', chr(195).chr(159) => 's', chr(195).chr(160) => 'a', chr(195).chr(161) => 'a', chr(195).chr(162) => 'a', chr(195).chr(163) => 'a', chr(195).chr(164) => 'a', chr(195).chr(165) => 'a', chr(195).chr(167) => 'c', chr(195).chr(168) => 'e', chr(195).chr(169) => 'e', chr(195).chr(170) => 'e', chr(195).chr(171) => 'e', chr(195).chr(172) => 'i', chr(195).chr(173) => 'i', chr(195).chr(174) => 'i', chr(195).chr(175) => 'i', chr(195).chr(177) => 'n', chr(195).chr(178) => 'o', chr(195).chr(179) => 'o', chr(195).chr(180) => 'o', chr(195).chr(181) => 'o', chr(195).chr(182) => 'o', chr(195).chr(182) => 'o', chr(195).chr(185) => 'u', chr(195).chr(186) => 'u', chr(195).chr(187) => 'u', chr(195).chr(188) => 'u', chr(195).chr(189) => 'y', chr(195).chr(191) => 'y',
+					// Decompositions for Latin Extended-A
+					chr(196).chr(128) => 'A', chr(196).chr(129) => 'a', chr(196).chr(130) => 'A', chr(196).chr(131) => 'a', chr(196).chr(132) => 'A', chr(196).chr(133) => 'a', chr(196).chr(134) => 'C', chr(196).chr(135) => 'c', chr(196).chr(136) => 'C', chr(196).chr(137) => 'c', chr(196).chr(138) => 'C', chr(196).chr(139) => 'c', chr(196).chr(140) => 'C', chr(196).chr(141) => 'c', chr(196).chr(142) => 'D', chr(196).chr(143) => 'd', chr(196).chr(144) => 'D', chr(196).chr(145) => 'd', chr(196).chr(146) => 'E', chr(196).chr(147) => 'e', chr(196).chr(148) => 'E', chr(196).chr(149) => 'e', chr(196).chr(150) => 'E', chr(196).chr(151) => 'e', chr(196).chr(152) => 'E', chr(196).chr(153) => 'e', chr(196).chr(154) => 'E', chr(196).chr(155) => 'e', chr(196).chr(156) => 'G', chr(196).chr(157) => 'g', chr(196).chr(158) => 'G', chr(196).chr(159) => 'g', chr(196).chr(160) => 'G', chr(196).chr(161) => 'g', chr(196).chr(162) => 'G', chr(196).chr(163) => 'g', chr(196).chr(164) => 'H', chr(196).chr(165) => 'h', chr(196).chr(166) => 'H', chr(196).chr(167) => 'h', chr(196).chr(168) => 'I', chr(196).chr(169) => 'i', chr(196).chr(170) => 'I', chr(196).chr(171) => 'i', chr(196).chr(172) => 'I', chr(196).chr(173) => 'i', chr(196).chr(174) => 'I', chr(196).chr(175) => 'i', chr(196).chr(176) => 'I', chr(196).chr(177) => 'i', chr(196).chr(178) => 'IJ', chr(196).chr(179) => 'ij', chr(196).chr(180) => 'J', chr(196).chr(181) => 'j', chr(196).chr(182) => 'K', chr(196).chr(183) => 'k', chr(196).chr(184) => 'k', chr(196).chr(185) => 'L', chr(196).chr(186) => 'l', chr(196).chr(187) => 'L', chr(196).chr(188) => 'l', chr(196).chr(189) => 'L', chr(196).chr(190) => 'l', chr(196).chr(191) => 'L', chr(197).chr(128) => 'l', chr(197).chr(129) => 'L', chr(197).chr(130) => 'l', chr(197).chr(131) => 'N', chr(197).chr(132) => 'n', chr(197).chr(133) => 'N', chr(197).chr(134) => 'n', chr(197).chr(135) => 'N', chr(197).chr(136) => 'n', chr(197).chr(137) => 'N', chr(197).chr(138) => 'n', chr(197).chr(139) => 'N', chr(197).chr(140) => 'O', chr(197).chr(141) => 'o', chr(197).chr(142) => 'O', chr(197).chr(143) => 'o', chr(197).chr(144) => 'O', chr(197).chr(145) => 'o', chr(197).chr(146) => 'OE', chr(197).chr(147) => 'oe', chr(197).chr(148) => 'R', chr(197).chr(149) => 'r', chr(197).chr(150) => 'R', chr(197).chr(151) => 'r', chr(197).chr(152) => 'R', chr(197).chr(153) => 'r', chr(197).chr(154) => 'S', chr(197).chr(155) => 's', chr(197).chr(156) => 'S', chr(197).chr(157) => 's', chr(197).chr(158) => 'S', chr(197).chr(159) => 's', chr(197).chr(160) => 'S', chr(197).chr(161) => 's', chr(197).chr(162) => 'T', chr(197).chr(163) => 't', chr(197).chr(164) => 'T', chr(197).chr(165) => 't', chr(197).chr(166) => 'T', chr(197).chr(167) => 't', chr(197).chr(168) => 'U', chr(197).chr(169) => 'u', chr(197).chr(170) => 'U', chr(197).chr(171) => 'u', chr(197).chr(172) => 'U', chr(197).chr(173) => 'u', chr(197).chr(174) => 'U', chr(197).chr(175) => 'u', chr(197).chr(176) => 'U', chr(197).chr(177) => 'u', chr(197).chr(178) => 'U', chr(197).chr(179) => 'u', chr(197).chr(180) => 'W', chr(197).chr(181) => 'w', chr(197).chr(182) => 'Y', chr(197).chr(183) => 'y', chr(197).chr(184) => 'Y', chr(197).chr(185) => 'Z', chr(197).chr(186) => 'z', chr(197).chr(187) => 'Z', chr(197).chr(188) => 'z', chr(197).chr(189) => 'Z', chr(197).chr(190) => 'z', chr(197).chr(191) => 's',
+					// Euro Sign
+					chr(226).chr(130).chr(172) => 'E',
+				);
+				$readable = array(
+					'\'s' => 's',
+					'\'n' => 'n',
+					'@' => ' at ',
+					'&' => ' and '
+				);
+			}
+			if ($options & Sjonsite::NORM_ACCENTS) {
+				$string = strtr($string, $chars);
+			}
+			if ($options & Sjonsite::NORM_READABLE) {
+				$string = strtr($string, $readable);
+			}
+			if ($options & Sjonsite::NORM_TOLOWER) {
+				$string = trim(strtolower($string));
+			}
+			if ($options & Sjonsite::NORM_SPACETODASH) {
+				$string = preg_replace(array('#([^A-Za-z0-9\+\-\.\,\=]+)#U', '#--+#', '#-\.#', '#\.-#', '#^([-]+)([^-]*)#', '#(.*)([-]+)$#'), array('-', '-', '.', '.', '$2', '$1'), $string);
+				if ($string && substr($string, -1) == '-') $string = substr($string, 0, -1);
+			}
+			return $string;
+		}
+
+		/**
+		 * Redirect to an uri
+		 *
+		 * @param string $uri
+		 */
+		public function redirect ($uri) {
+			session_write_close();
+			header('Location: ' . $uri);
+			unset($this->db);
+			exit;
+		}
+
+		/**
+		 * Static Run Handler
+		 * Does the actual initialization and execution
+		 *
 		 * @return void
 		 */
-		public function headers ($type = false, $nocache = false, $extra = false) {
-			if (!$type) {
-				$type = (strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml') !== false) ? 'application/xhtml+xml' : 'text/html';
-			}
-			header('Content-Type: '.$type.'; charset=UTF-8');
-			if ($nocache) {
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Pragma: nocache');
-			}
-			//header('ETag: ssEGJWRUIOJHGUIWOERJHGUIVOWERVNOUIEWNVJOWHENFGUJHEWROOQWJVNSK');
-			//header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-			if (is_array($extra)) {
-				foreach ($extra as $key => $val) {
-					header("$key: $val");
-				}
-			}
+		public static function run () {
 		}
 
 		/**
-		 * Redirect to another url
+		 * Default Event Handler
 		 *
-		 * @param string $url
-		 * @return bool
+		 * @return string
 		 */
-		public function redirect ($url, $args = null, $exit = false) {
-			$qs = null;
-			if (is_array($args) && count($args)) {
-				$qs = array();
-				foreach ($args as $key => $val) {
-					$qs[] = urlencode($key).'='.rawurlencode($val);
-				}
-				$qs = implode('&', $qs);
-			}
-			$url = str_replace(array("\r", "\n"), '', $url);
-			if (preg_match('!^([a-z0-9]+)://!i', $url)) { // already absolute
-				$tmp = parse_url($url);
-				if (isset($tmp['query']) && $qs) {
-					$tmp['query'] .= '&'.$qs;
-				}
-				$url = $tmp['scheme'].'://'.(isset($tmp['user']) ? $tmp['user'].':'.$tmp['pass'].'@' : '') .
-					$tmp['host'].(isset($tmp['port']) && $tmp['port'] != 80 ? ':'.$tmp['port'] : '') .
-					$tmp['path'].(isset($tmp['query']) ? '?'.$tmp['query'] : ($qs ? '?'.$qs : '')) .
-					(isset($tmp['fragment']) ? '#'.$tmp['fragment'] : '');
-			}
-			else { // relative
-				$host = (empty($_SERVER['HTTP_HOST']) ? (empty($_SERVER['SERVER_NAME']) ? 'localhost' : explode(':', $_SERVER['SERVER_NAME'])) : explode(':', $_SERVER['HTTP_HOST']));
-				if (is_array($host)) {
-					list($host) = $host;
-				}
-				$proto = (isset($_SERVER['HTTPS']) && !strcasecmp($_SERVER['HTTPS'], 'on') ? 'https' : 'http');
-				$port = (isset($_SERVER['SERVER_PORT']) ? ($proto == 'https' && $_SERVER['SERVER_PORT'] == 443 ? null : $_SERVER['SERVER_PORT']) : 80);
-				if ($proto == 'http' && $port == 80) {
-					$port = null;
-				}
-				$server = $proto .'://'. $host . ($port ? ':'. $port : '');
-				if (!strlen($url)) {
-					$url = (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
-				}
-				if ($url{0} == '/') {
-					$url = $server . $url;
-				}
-				else {
-					$path = strtr(((isset($_SERVER['PATH_INFO']) && strlen($_SERVER['PATH_INFO']) && $_SERVER['PHP_SELF'] != $_SERVER['PATH_INFO']) ? dirname(substr($_SERVER['PHP_SELF'], 0, -strlen($_SERVER['PATH_INFO']))) : dirname($_SERVER['PHP_SELF'])), '\\', '/');
-					if (substr($path, -1) != '/') {
-						$path .= '/';
-					}
-					$url = $server . $path . $url;
-				}
-				if ($qs) {
-					$url .= '?' . $qs;
-				}
-			}
-			if (headers_sent()) {
-				echo '<meta http-equiv="Redirect" content="0; URL=' . $url . '" />';
-				echo '<script type="text/javascript">';
-				echo 'location.href = "' . $url . '";';
-				echo '</script>';
-				printf('Redirecting to: <a href="%s">%s</a>.', $url, $url);
-			}
-			else {
-				header('Location: ' . $url);
-				if (isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) != 'head') {
-					printf('Redirecting to: <a href="%s">%s</a>.', $url, $url);
-				}
-			}
-			if ($exit) {
-				exit;
-			}
-			return true;
-		}
+		abstract function handleDefaultEvent ();
 
 		/**
-		 * Returns true if $date is a valid date
+		 * Return the path part of $uri (wich defaults to the current request)
 		 *
-		 * @param string $date
-		 * @return bool
+		 * @param int $idx
+		 * @param string $uri
+		 * @return string
 		 */
-		public function isDate ($date) {
+		public function getPathPart ($idx, $uri = null) {
+			if (is_null($uri)) $uri = $this->request;
+			$uri = explode('/', $uri);
+			return ((isset($uri[$idx]) && $uri[$idx]) ? $uri[$idx] : null);
 		}
 
 		/**
@@ -322,7 +374,7 @@
 		 * @param string $email
 		 * @return bool
 		 */
-		public function isEmail ($email) {
+		public static function isEmail ($email) {
 			return (bool) preg_match('/^[a-z0-9._-]+@[a-z0-9][a-z0-9.-]{0,61}[a-z0-9]\.[a-z.]{2,6}$/i', $email);
 		}
 
@@ -331,24 +383,147 @@
 		 *
 		 * @return bool
 		 */
-		public function isPost () {
+		public static function isPost () {
 			return (strtolower($_SERVER['REQUEST_METHOD']) == 'post');
+		}
+
+		/**
+		 * Returns true if the current request is an https request
+		 *
+		 * @return bool
+		 */
+		public static function isSecure () {
+			return (array_key_exists('HTTPS', $_SERVER) && (strtolower($_SERVER['HTTPS']) == 'on'));
+		}
+
+		/**
+		 * Messaging System - Are there any messages?
+		 *
+		 * @return bool
+		 */
+		public static function hasMessage () {
+			return (isset($_SESSION['messages']) && count($_SESSION['messages']) > 0);
+		}
+
+		/**
+		 * Messaging System - Return a message
+		 *
+		 * @return string
+		 */
+		public static function getMessage () {
+			return array_shift($_SESSION['messages']);
+		}
+
+		/**
+		 * Messaging System - Add a message
+		 *
+		 * @param string $message
+		 * @return void
+		 */
+		public static function setMessage ($message) {
+			$_SESSION['messages'][] = $message;
+		}
+
+		/**
+		 * Destructor
+		 *
+		 * @return void
+		 */
+		public function __destruct () {
+			session_write_close();
+			$this->db = null;
 		}
 
 	}
 
 	/**
-	 * Interface SjonsiteController
+	 * Class Sjonsite_Model
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
 	 */
-	interface SjonsiteController {
+	abstract class Sjonsite_Model {
 
 		/**
-		 * Default Event Handler
+		 * Full table name
 		 *
-		 * @abstract
-		 * @return mixed
+		 * @var string
 		 */
-		public abstract function handleDefaultEvent();
+		protected $_table;
+
+		/**
+		 * Field names
+		 *
+		 * @var array
+		 */
+		protected $_fields;
+
+		/**
+		 * Constructor
+		 *
+		 * @param string $table
+		 * @param array $fields
+		 * @param array $values
+		 */
+		public function __construct ($table, $fields, $values = null) {
+			$this->_table = SJONSITE_PREFIX . $table;
+			$this->_fields = $fields;
+			if (is_array($values)) {
+				foreach ($this->_fields as $field) {
+					$this->$field = $values[$field];
+				}
+			}
+		}
+
+		/**
+		 * Return the table name
+		 *
+		 * @return string
+		 */
+		public function getTable () {
+			return $this->_table;
+		}
+
+		/**
+		 * Return the field names
+		 *
+		 * @return array
+		 */
+		public function getFields () {
+			return $this->_fields;
+		}
+
+	}
+
+
+	/**
+	 * Class Sjonsite_Management
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
+	 */
+	abstract class Sjonsite_Management extends Sjonsite {
+
+		/**
+		 * Constructor
+		 *
+		 * @param array $resource
+		 */
+		public function __construct ($resource) {
+			parent::__construct($resource, 'checkAuth');
+		}
+
+		/**
+		 * Check Authentication
+		 *
+		 * @return string
+		 */
+		public function checkAuth () {
+			if (empty($_SESSION['auth'])) {
+				return 'management-login';
+			}
+			return false;
+		}
 
 	}
 

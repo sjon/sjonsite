@@ -1,48 +1,37 @@
 <?php
 
 	/**
-	 * SjonSite - Frontend Controller
+	 * Sjonsite - Configuration and Loader
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
-	 * @package SjonSite
+	 * @package Sjonsite
+	 * @copyright Sjon's dotCom 2007
 	 * @version $Id$
 	 */
 
-	require_once '../include/config.php';
+	/**
+	 * Configuration
+	 */
+	define ('SJONSITE_ROOT', dirname(dirname(__FILE__)));
+	define ('SJONSITE_HTDOCS', SJONSITE_ROOT . '/htdocs');
+	define ('SJONSITE_INCLUDE', SJONSITE_ROOT . '/include');
+	define ('SJONSITE_VAR', SJONSITE_ROOT . '/var');
+	define ('SJONSITE_CACHE', SJONSITE_VAR . '/cache');
+	define ('SJONSITE_TEMPLATE', SJONSITE_VAR . '/template');
+
+	define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonsite');
+	define ('SJONSITE_PDO_USER', 'username');
+	define ('SJONSITE_PDO_PASS', 'password');
+	define ('SJONSITE_PREFIX', 'v1_');
 
 	/**
-	 * Class Sjonsite_Main
+	 * Load library
 	 */
-	final class Sjonsite_Main extends Sjonsite implements SjonsiteController {
-
-		public function __construct () {
-			parent::__construct(array(
-				'dsn' => 'mysql://username:password@localhost:3306/database?persistent=true',
-				'upi' => false,
-			));
-		}
-
-		/**
-		 * Contact Event
-		 *
-		 * @return void
-		 */
-		public function handleContactEvent () {
-		}
-
-		/**
-		 * Default Event
-		 *
-		 * @return void
-		 */
-		public function handleDefaultEvent () {
-		}
-
-	}
+	require_once '../include/library.php';
 
 	/**
 	 * Run
 	 */
-	Sjonsite::run('main');
+	Sjonsite::run();
 
 ?>
