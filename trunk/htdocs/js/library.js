@@ -1,5 +1,5 @@
 /**
- * Sjonsite - Stylesheet
+ * Sjonsite - Javascript Library
  *
  * @author Sjon <sjonscom@gmail.com>
  * @package Sjonsite
