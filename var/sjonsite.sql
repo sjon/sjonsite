@@ -4,6 +4,7 @@
 -- @author Sjon <sjonscom@gmail.com>
 -- @package Sjonsite
 -- @copyright Sjon's dotCom 2007
+-- @license Mozilla Public License 1.1
 -- @version $Id$
 -- */
 
@@ -36,6 +37,8 @@ CREATE TABLE v1_alias (
 INSERT INTO v1_resource VALUES (1, 1, 2, 'Homepage', NULL, NULL, 'content', 'A');
 INSERT INTO v1_alias VALUES ('/', 1);
 INSERT INTO v1_alias VALUES ('/home', 1);
+INSERT INTO v1_resource VALUES (2, 0, 0, 'Management', NULL, NULL, 'content', 'A');
+INSERT INTO v1_alias VALUES ('/management', 2);
 
 DROP VIEW IF EXISTS sjonsite.v_resource_by_alias;
 CREATE VIEW sjonsite.v_resource_by_alias AS SELECT * FROM v1_resource r RIGHT JOIN v1_alias a ON a.resource = r.id WHERE uri = '/';
@@ -45,8 +48,8 @@ CREATE VIEW sjonsite.v_resource_cache AS SELECT r.id, a.uri, r.module, r.state F
 
 -- core users
 
-DROP TABLE IF EXISTS v1_management;
-CREATE TABLE v1_management (
+DROP TABLE IF EXISTS v1_user;
+CREATE TABLE v1_user (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	firstname VARCHAR (64) NULL,
 	lastname VARCHAR (64) NULL,
@@ -58,6 +61,9 @@ CREATE TABLE v1_management (
 	UNIQUE KEY email_idx (email),
 	KEY state_idx (state)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP VIEW IF EXISTS sjonsite.v_user;
+CREATE VIEW sjonsite.v_user AS SELECT * FROM v1_user;
 
 -- content module
 
