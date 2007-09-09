@@ -6,6 +6,7 @@
 	 * @author Sjon <sjonscom@gmail.com>
 	 * @package Sjonsite
 	 * @copyright Sjon's dotCom 2007
+	 * @license Mozilla Public License 1.1
 	 * @version $Id$
 	 */
 
@@ -511,7 +512,7 @@
 			$this->_fields = $fields;
 			if (is_array($values)) {
 				foreach ($this->_fields as $field) {
-					$this->$field = $values[$field];
+					$this->$field = (array_key_exists($field, $values) ? $values[$field] : null);
 				}
 			}
 		}
@@ -537,12 +538,191 @@
 	}
 
 	/**
+	 * Class Sjonsite_ResourceModel
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
+	 */
+	final class Sjonsite_ResourceModel {
+
+		/**
+		 * Id
+		 *
+		 * @var int
+		 */
+		public $id;
+
+		/**
+		 * NestedSet Left
+		 *
+		 * @var int
+		 */
+		public $ns_left;
+
+		/**
+		 * NestedSet Right
+		 *
+		 * @var int
+		 */
+		public $ns_right;
+
+		/**
+		 * Title
+		 *
+		 * @var string
+		 */
+		public $title;
+
+		/**
+		 * Description
+		 *
+		 * @var string
+		 */
+		public $description;
+
+		/**
+		 * Keywords
+		 *
+		 * @var string
+		 */
+		public $keywords;
+
+		/**
+		 * Module
+		 *
+		 * @var string
+		 */
+		public $module;
+
+		/**
+		 * State
+		 *
+		 * @var constant
+		 */
+		public $state;
+
+		/**
+		 * Constructor
+		 *
+		 * @param array $values
+		 */
+		public function __construct ($values = null) {
+			parent::__construct('resource', array('id', 'ns_left', 'ns_right', 'title', 'description', 'keywords', 'module', 'state'), $values);
+		}
+
+	}
+
+	/**
+	 * Class Sjonsite_AliasModel
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
+	 */
+	final class Sjonsite_AliasModel {
+
+		/**
+		 * Uri
+		 *
+		 * @var string
+		 */
+		public $uri;
+
+		/**
+		 * Resource
+		 *
+		 * @var int
+		 */
+		public $resource;
+
+		/**
+		 * Constructor
+		 *
+		 * @param array $values
+		 */
+		public function __construct ($values = null) {
+			parent::__construct('alias', array('uri', 'resource'), $values);
+		}
+
+	}
+
+	/**
+	 * Class Sjonsite_UserModel
+	 *
+	 * @author Sjon <sjonscom@gmail.com>
+	 * @copyright Sjon's dotCom 2007
+	 */
+	final class Sjonsite_UserModel {
+
+		/**
+		 * Id
+		 *
+		 * @var int
+		 */
+		public $id;
+
+		/**
+		 * First name
+		 *
+		 * @var string
+		 */
+		public $firstname;
+
+		/**
+		 * Last name
+		 *
+		 * @var string
+		 */
+		public $lastname;
+
+		/**
+		 * Email
+		 *
+		 * @var string
+		 */
+		public $email;
+
+		/**
+		 * Password
+		 *
+		 * @var string
+		 */
+		public $passwd;
+
+		/**
+		 * Access level
+		 *
+		 * @var int
+		 */
+		public $access;
+
+		/**
+		 * State
+		 *
+		 * @var constant
+		 */
+		public $state;
+
+		/**
+		 * Constructor
+		 *
+		 * @param array $values
+		 */
+		public function __construct ($values = null) {
+			parent::__construct('user', array('id', 'firstname', 'lastname', 'email', 'passwd', 'access', 'state'), $values);
+		}
+
+	}
+
+	/**
 	 * Interface Sjonsite_Model
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
 	 * @copyright Sjon's dotCom 2007
 	 */
 	interface Sjonsite_Filter {
+
+		public static function process ($string);
+
 	}
 
 	/**
@@ -552,6 +732,9 @@
 	 * @copyright Sjon's dotCom 2007
 	 */
 	interface Sjonsite_Filter_Config {
+
+		public static function getOption ($name);
+
 	}
 
 ?>
