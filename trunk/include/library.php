@@ -36,7 +36,7 @@
 	define ('SJONSITE_TIMEZONE', 'Europe/Amsterdam');
 	if (version_compare(phpversion(), '5.2', '<')) exit('You are not running PHP 5.2 or higher.');
 	if (get_magic_quotes_gpc()) exit('You should disable magic quotes, they\'re evil.');
-	if (class_exists('PDO', false)) exit('You don\'t have the PDO extension enabled.');
+	if (!class_exists('PDO', false)) exit('You don\'t have the PDO extension enabled.');
 	// we only support mysql for now.
 	if (!in_array('mysql', PDO::getAvailableDrivers())) exit('You don\'t have the PDO_mysql extension enabled.');
 
@@ -161,7 +161,7 @@
 				$this->display('error-template');
 				return;
 			}
-			$this->request = preg_replace('#[^a-z0-9\_\-\/]#', '', strtolower($_SERVER['REQUEST_URI']));
+			$this->request = preg_replace('#[^a-z0-9\_\-\/\?]#', '', strtolower($_SERVER['REQUEST_URI']));
 			if (strpos($this->request, '?') !== false) {
 				$this->request = substr($this->request, 0, strpos($this->request, '?'));
 			}
@@ -189,7 +189,6 @@
 				$this->display($template);
 				ob_flush();
 			}
-			exit();
 		}
 
 		/**
@@ -357,6 +356,18 @@
 		 * @return void
 		 */
 		public static function run () {
+			$ls = get_declared_classes();
+			$mc = null;
+			foreach ($ls as $cn) {
+				if (is_subclass_of($cn, 'Sjonsite') && $cn != 'Sjonsite_Management') {
+					$mc = $cn;
+					break;
+				}
+			}
+			if (is_null($mc)) {
+				throw new Exception('There is no Runnable class!', 1234);
+			}
+			return new $mc();
 		}
 
 		/**

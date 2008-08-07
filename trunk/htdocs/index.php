@@ -31,6 +31,17 @@
 	require_once '../include/library.php';
 
 	/**
+	 * Application class
+	 */
+	final class Sjonsite_App extends Sjonsite {
+
+		public function handleDefaultEvent () {
+			echo 'OK';
+		}
+
+	}
+
+	/**
 	 * Run
 	 */
 	Sjonsite::run();
