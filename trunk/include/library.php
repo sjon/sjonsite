@@ -220,9 +220,7 @@
 			if (!is_null($value) || $isnull === true) {
 				$vars[$name] = $value;
 			}
-			else {
-				return (array_key_exists($name, $vars) ? $vars[$name] : null);
-			}
+			return (array_key_exists($name, $vars) ? $vars[$name] : null);
 		}
 
 		/**
