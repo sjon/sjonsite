@@ -28,7 +28,7 @@
 	/**
 	 * Load library
 	 */
-	require_once '../include/library.php';
+	require_once SJONSITE_INCLUDE . '/library.php';
 
 	/**
 	 * Application class
