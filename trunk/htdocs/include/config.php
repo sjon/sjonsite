@@ -29,21 +29,21 @@
 	 *
 	 * @var string
 	 */
-	define ('SJONSITE_PDO_DSN', '');
+	define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonsite');
 
 	/**
 	 * PDO connection username
 	 *
 	 * @var string
 	 */
-	define ('SJONSITE_PDO_USER', '');
+	define ('SJONSITE_PDO_USER', 'username');
 
 	/**
 	 * PDO connection password
 	 *
 	 * @var string
 	 */
-	define ('SJONSITE_PDO_PASS', '');
+	define ('SJONSITE_PDO_PASS', 'password');
 
 	/**
 	 * PDO table prefix
@@ -53,10 +53,13 @@
 	define ('SJONSITE_PDO_PREFIX', 'sjonsite_');
 
 	/**
-	 * Enter description here...
-	 *
-	 * @var
+	 * Set our default timezone
 	 */
-	define ('SJONSITE_', '');
+	date_default_timezone_set('Europe/Amsterdam');
+
+	/**
+	 * Name our session
+	 */
+	session_name('Sjonsite');
 
 ?>
