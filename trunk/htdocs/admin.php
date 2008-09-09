@@ -90,7 +90,199 @@
 		}
 
 		/**
-		 * Handle Admin Home
+		 * Handle adding pages
+		 *
+		 * @return void
+		 */
+		protected function doPagesAdd () {
+			try {
+				// prepare data
+				$this->template('admin-pages-form');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle editing pages
+		 *
+		 * @return void
+		 */
+		protected function doPagesEdit () {
+			try {
+				// prepare data
+				$this->template('admin-pages-form');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle removing pages
+		 *
+		 * @return void
+		 */
+		protected function doPagesRemove () {
+			try {
+				// prepare data
+				$this->template('admin-message');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle listing pages
+		 *
+		 * @return void
+		 */
+		protected function doPagesList () {
+			try {
+				// prepare data
+				$this->template('admin-pages');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle adding galleries
+		 *
+		 * @return void
+		 */
+		protected function doGalleryAdd () {
+			try {
+				// prepare data
+				$this->template('admin-gallery-form');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle editing galleries
+		 *
+		 * @return void
+		 */
+		protected function doGalleryEdit () {
+			try {
+				// prepare data
+				$this->template('admin-gallery-form');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle removing galleries
+		 *
+		 * @return void
+		 */
+		protected function doGalleryRemove () {
+			try {
+				// prepare data
+				$this->template('admin-message');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle listing galleries
+		 *
+		 * @return void
+		 */
+		protected function doGalleryList () {
+			try {
+				// prepare data
+				$this->template('admin-gallery');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle adding users
+		 *
+		 * @return void
+		 */
+		protected function doUsersAdd () {
+			try {
+				// prepare data
+				$this->template('admin-users-form');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle editing users
+		 *
+		 * @return void
+		 */
+		protected function doUsersEdit () {
+			try {
+				// prepare data
+				$this->template('admin-users-form');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle removing users
+		 *
+		 * @return void
+		 */
+		protected function doUsersRemove () {
+			try {
+				// prepare data
+				$this->template('admin-message');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle listing users
+		 *
+		 * @return void
+		 */
+		protected function doUsersList () {
+			try {
+				// prepare data
+				$this->template('admin-users');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle admin home
 		 *
 		 * @return void
 		 */
