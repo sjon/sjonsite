@@ -1,1 +1,15 @@
-README
+Sjonsite - README
+
+@author Sjon <sjonscom@gmail.com>
+@package Sjonsite
+@copyright Sjon's dotCom 2008
+@license Mozilla Public License 1.1
+@version $Id$
+
+I've been fiddling around with many many scripts, ideas, mini-projects, and
+all that I've got to show for it are a few websites with no content whatsoever.
+So for now, I'm done with checking out what other people have created, trying
+out new techniques like nested sets and multiple inheritance and such, and
+finally started work on what I intend to be a small application that does one
+thing very well: serve a small website with a few pages, some image galleries
+and a contact form.
