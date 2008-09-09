@@ -13,3 +13,12 @@ out new techniques like nested sets and multiple inheritance and such, and
 finally started work on what I intend to be a small application that does one
 thing very well: serve a small website with a few pages, some image galleries
 and a contact form.
+
+Basic setup of this application:
+
+- simple hierarchy of user-maintainable pages (two levels)
+- ability to have a contact page and a search page
+- ability to add images to a page
+- ability to add a gallery (wich is a page with predefined layout)
+- ability to 'position' pages in the menu
+- simple user-levels (manage pages, manage galleries, manage users)

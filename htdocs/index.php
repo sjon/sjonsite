@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * Sjonsite - Launcher
+	 * Sjonsite - Main
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
 	 * @package Sjonsite
@@ -34,9 +34,6 @@
 		 */
 		public function processRequest () {
 			switch ($this->pathPart(1)) {
-				case 'admin':
-					$this->doAdmin();
-					break;
 				case 'contact':
 					$this->doContact();
 					break;
@@ -50,46 +47,52 @@
 		}
 
 		/**
-		 * Handle admin request
-		 *
-		 * @return void
-		 */
-		protected function doAdmin () {}
-
-		/**
 		 * Handle contact request
 		 *
 		 * @return void
 		 */
-		protected function doContact () {}
+		protected function doContact () {
+			try {
+				// prepare data
+				$this->template('page-contact');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
 
 		/**
 		 * Handle search request
 		 *
 		 * @return void
 		 */
-		protected function doSearch () {}
+		protected function doSearch () {
+			try {
+				// prepare data
+				$this->template('page-search');
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
 
 		/**
 		 * Handle page request
 		 *
 		 * @return void
 		 */
-		protected function doPage () {}
-
-		/**
-		 * Display a content page
-		 *
-		 * @return void
-		 */
-		protected function displayPage () {}
-
-		/**
-		 * Display a gallery page
-		 *
-		 * @return void
-		 */
-		protected function displayGallery () {}
+		protected function doPage () {
+			try {
+				// prepare data
+				$this->template('page-content'); // page-gallery
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
 
 	}
 
