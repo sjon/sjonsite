@@ -1,11 +1,18 @@
--- Sjonsite - SQL Structure
 --
--- @author Sjon <sjonscom@gmail.com>
--- @package Sjonsite
--- @copyright Sjon''s dotCom 2008
--- @license Mozilla Public License 1.1
--- @version $Id$
+-- /**
+--  * Sjonsite - SQL Structure
+--  *
+--  * @author Sjon <sjonscom@gmail.com>
+--  * @package Sjonsite
+--  * @copyright Sjon's dotCom 2008
+--  * @license Mozilla Public License 1.1
+--  * @version $Id$
+--  */
+--
 
+-- CREATE DATABASE sjonsite /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+DROP TABLE IF EXISTS sjonsite_pages;
 CREATE TABLE sjonsite_pages (
 	p_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	p_pid MEDIUMINT UNSIGNED NULL,
@@ -20,17 +27,20 @@ CREATE TABLE sjonsite_pages (
 	UNIQUE KEY p_uri_idx (p_uri),
 	KEY p_sorting_idx (p_sorting),
 	KEY p_state_idx (p_state)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS sjonsite_gallery;
 CREATE TABLE sjonsite_gallery (
 	g_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	g_page MEDIUMINT UNSIGNED NULL,
 	g_title VARCHAR (255) NOT NULL,
 	g_summary TEXT NULL,
 	PRIMARY KEY (g_id),
-	UNIQUE KEY g_page_idx (g_page)
-);
+	UNIQUE KEY g_page_idx (g_page),
+	CONSTRAINT g_page_fk FOREIGN KEY (g_page) REFERENCES sjonsite_pages (p_id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS sjonsite_images;
 CREATE TABLE sjonsite_images (
 	i_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	i_parent ENUM ('P', 'G', 'U') NOT NULL DEFAULT 'U',
@@ -42,8 +52,9 @@ CREATE TABLE sjonsite_images (
 	PRIMARY KEY (i_id),
 	KEY i_parent_idx (i_parent),
 	KEY i_parent_id_idx (i_parent_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS sjonsite_users;
 CREATE TABLE sjonsite_users (
 	u_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	u_name VARCHAR (255) NOT NULL,
@@ -54,5 +65,5 @@ CREATE TABLE sjonsite_users (
 	PRIMARY KEY (u_id),
 	UNIQUE KEY u_email_idx (u_email),
 	KEY u_state_idx (u_state)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
