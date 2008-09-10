@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * Sjonsite -
+	 * Sjonsite Template - Page Search
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
 	 * @package Sjonsite
@@ -10,4 +10,8 @@
 	 * @version $Id$
 	 */
 
+	$this->template('include/header');
+
+
+	$this->template('include/footer');
 ?>
