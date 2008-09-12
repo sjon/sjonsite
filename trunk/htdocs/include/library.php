@@ -39,6 +39,13 @@
 		protected $request;
 
 		/**
+		 * System settings
+		 *
+		 * @var Sjonsite_Settings
+		 */
+		protected $settings;
+
+		/**
 		 * Constructor
 		 *
 		 */
@@ -64,6 +71,14 @@
 			}
 			if (!ini_get('zlib.output_compression')) {
 				ob_start('ob_gzhandler');
+			}
+			try {
+				$this->settings = new Sjonsite_Settings($this->db);
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+				return;
 			}
 			$this->processRequest();
 		}
@@ -352,11 +367,15 @@
 		 * Loads a template
 		 *
 		 * @param string $name
+		 * @param bool $return
 		 * @return void
 		 */
-		public function template ($name) {
+		public function template ($name, $return = false) {
 			$fullname = SJONSITE_INCLUDE . '/template/' . $name . '.php';
 			if (file_exists($fullname)) {
+				if ($return) {
+					return file_get_contents($fullname);
+				}
 				include $fullname;
 			}
 			else {
@@ -484,6 +503,143 @@
 					}
 				}
 			}
+		}
+
+	}
+
+	/**
+	 * Class Sjonsite_Settings
+	 *
+	 * @package Sjonsite
+	 */
+	final class Sjonsite_Settings {
+
+		/**
+		 * Settings array
+		 *
+		 * @var array
+		 */
+		private $settings;
+
+		/**
+		 * Constructor
+		 *
+		 * @param PDO $db
+		 */
+		public function __construct ($db) {
+			$sql = 'SELECT s_name AS name, s_value AS value FROM ' . SJONSITE_PDO_PREFIX . 'settings';
+			$res = $this->db->query($sql);
+			while ($res && $row = $res->fetch(PDO::FETCH_OBJECT)) {
+				$this->settings[$row->name] = unserialize($row->value);
+			}
+			$res = null;
+		}
+
+		/**
+		 * Insert a setting (object and database)
+		 *
+		 * @param PDO $db
+		 * @param string $name
+		 * @param mixed $value
+		 * @return bool
+		 */
+		public function insert ($db, $name, $value) {
+			$this->settings[$name] = $value;
+			try {
+				$db->beginTransaction();
+				$sql = 'INSERT ' . SJONSITE_PDO_PREFIX . 'settings (s_name, s_value) VALUES (:name, :value)';
+				$res = $db->prepare($sql);
+				if ($res->execute(array(
+					':name' => $name,
+					':value' => $value
+				))) {
+					$db->commit();
+					$res = null;
+					return true;
+				}
+				else {
+					$db->rollBack();
+					return false;
+				}
+			}
+			catch (Exception $e) {
+				// ? $db->rollBack();
+				return $e;
+			}
+		}
+
+		/**
+		 * Update a setting (object and database)
+		 *
+		 * @param PDO $db
+		 * @param string $name
+		 * @param mixed $value
+		 * @return bool
+		 */
+		public function update ($db, $name, $value) {
+			$this->settings[$name] = $value;
+			try {
+				$db->beginTransaction();
+				$sql = 'UPDATE ' . SJONSITE_PDO_PREFIX . 'settings SET s_value = :value WHERE s_name = :name';
+				$res = $db->prepare($sql);
+				if ($res->execute(array(
+					':name' => $name,
+					':value' => $value
+				))) {
+					$db->commit();
+					$res = null;
+					return true;
+				}
+				else {
+					$db->rollBack();
+					return false;
+				}
+			}
+			catch (Exception $e) {
+				// ? $db->rollBack();
+				return $e;
+			}
+		}
+
+		/**
+		 * Overloading getter
+		 *
+		 * @param string $name
+		 * @return mixed
+		 */
+		public function __get ($name) {
+			return (array_key_exists($name, $this->settings) ? $this->settings[$name] : null);
+		}
+
+		/**
+		 * Overloading setter
+		 *
+		 * @param string $name
+		 * @param mixed $value
+		 * @return void
+		 */
+		public function __set ($name, $value) {
+			$this->settings[$name] = $value;
+		}
+
+		/**
+		 * Overloading issetter
+		 *
+		 * @param string $name
+		 * @return bool
+		 */
+		public function __isset ($name) {
+			return array_key_exists($name, $this->settings);
+		}
+
+		/**
+		 * Overloading unsetter
+		 *
+		 * @param string $name
+		 * @return void
+		 */
+		public function __unset ($name) {
+			unset($this->settings[$name]);
 		}
 
 	}
