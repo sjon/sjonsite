@@ -83,6 +83,9 @@
 							break;
 					}
 					break;
+				case 'logout':
+					$this->doLogout();
+					break;
 				default:
 					$this->doAdmin();
 					break;
@@ -282,6 +285,17 @@
 		}
 
 		/**
+		 * Handle admin logout
+		 *
+		 * @return void
+		 */
+		protected function doLogout () {
+			$_SESSION['adminFlag'] = false;
+			$_SESSION['adminHash'] = null;
+			$this->redirect('/');
+		}
+
+		/**
 		 * Handle admin home
 		 *
 		 * @return void
@@ -295,6 +309,15 @@
 				$this->ex = $e;
 				$this->template('system-error');
 			}
+		}
+
+		/**
+		 * Is the current user an admin user
+		 *
+		 * @return bool
+		 */
+		public function isAdmin () {
+			return true;
 		}
 
 	}

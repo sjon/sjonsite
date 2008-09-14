@@ -69,6 +69,46 @@
 		}
 
 		/**
+		 * Query
+		 *
+		 * @var string
+		 * @see doSearch()
+		 */
+		protected $searchQuery;
+
+		/**
+		 * Results
+		 *
+		 * @var array
+		 * @see doSearch()
+		 */
+		protected $searchResults;
+
+		/**
+		 * Resultcount
+		 *
+		 * @var int
+		 * @see doSearch()
+		 */
+		protected $searchCount;
+
+		/**
+		 * Current page
+		 *
+		 * @var int
+		 * @see doSearch()
+		 */
+		protected $searchPage;
+
+		/**
+		 * Total pages
+		 *
+		 * @var int
+		 * @see doSearch()
+		 */
+		protected $searchPages;
+
+		/**
 		 * Handle search request
 		 *
 		 * @return void
@@ -76,8 +116,32 @@
 		protected function doSearch () {
 			try {
 				$this->preparePage();
-
-				// prepare data
+				$this->searchCount = 0;
+				$this->searchQuery = $this->param('q', null);
+				$this->searchResults = array();
+				$this->searchPage = $this->param('p', 1);
+				$this->searchPages = 0;
+				if (empty($this->settings->searchPerPage)) {
+					$this->settings->insert($this->db, 'searchPerPage', 10);
+				}
+				if ($this->searchQuery) {
+					$sql = 'SELECT COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE (p_title LIKE ' . $this->db->quote('%' . $this->searchQuery . '%') . ' OR p_summary LIKE ' . $this->db->quote('%' . $this->searchQuery . '%') . ') AND p_state = ' . $this->db->quote(Sjonsite_Model::ACTIVE);
+					$res = $this->db->query($sql);
+					$this->searchCount = $res->fetchColumn();
+					$res = null;
+					$this->searchPages = (floor($this->searchCount / $this->settings->searchPerPage) + ($this->searchCount % $this->settings->searchPerPage ? 1 : 0));
+					if ($this->searchPage < 1 || $this->searchPage > $this->searchPages) {
+						$this->searchPage = 1;
+					}
+					if ($this->searchCount > 0) {
+						$sql = 'SELECT p_uri, p_title, p_summary FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE (p_title LIKE ' . $this->db->quote('%' . $this->searchQuery . '%') . ' OR p_summary LIKE ' . $this->db->quote('%' . $this->searchQuery . '%') . ') AND p_state = ' . $this->db->quote(Sjonsite_Model::ACTIVE) . ' LIMIT ' . ($this->searchPage * $this->settings->searchPerPage - $this->settings->searchPerPage) . ', ' . $this->settings->searchPerPage;
+						$res = $this->db->query($sql);
+						while ($res && $row = $res->fetch(PDO::FETCH_ASSOC)) {
+							$this->searchResults[] = $row;
+						}
+						$res = null;
+					}
+				}
 				$this->template('page-search');
 			}
 			catch (Exception $e) {
@@ -87,6 +151,30 @@
 		}
 
 		/**
+		 * PagesModel object
+		 *
+		 * @var Sjonsite_PagesModel
+		 * @see doPage()
+		 */
+		protected $pagePage;
+
+		/**
+		 * GalleryModel object
+		 *
+		 * @var Sjonsite_GalleryModel
+		 * @see doPage()
+		 */
+		protected $pageGallery;
+
+		/**
+		 * ImagesModel object array
+		 *
+		 * @var array
+		 * @see doPage()
+		 */
+		protected $pageImages;
+
+		/**
 		 * Handle page request
 		 *
 		 * @return void
@@ -94,9 +182,36 @@
 		protected function doPage () {
 			try {
 				$this->preparePage();
-
-				// prepare data
-				$this->template('page-content'); // page-gallery
+				$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'pages p LEFT JOIN ' . SJONSITE_PDO_PREFIX . 'gallery g ON p.p_gallery = g.g_id WHERE p_uri = ' . $this->db->quote($this->request);
+				$res = $this->db->query($sql);
+				if ($res && $row = $res->fetch(PDO::FETCH_ASSOC)) {
+					$res = null;
+					$this->pagePage = new Sjonsite_PagesModel($row);
+					$this->pageImages = array();
+					if ($this->pagePage->p_gallery) {
+						$this->pageGallery = new Sjonsite_GalleryModel($row);
+						$sql = 'SELECT i_id, i_uri, i_title, i_width, i_height FROM ' . SJONSITE_PDO_PREFIX . 'images WHERE i_parent = ' . $this->db->quote(Sjonsite_Model::GALLERY) . ' AND i_parent_id = ' . $this->db->quote($this->pageGallery->g_id);
+						$res = $this->db->query($sql);
+						while ($res && $row = $res->fetch(PDO::FETCH_ASSOC)) {
+							$this->pageImages[$row['i_id']] = new Sjonsite_ImagesModel($row);
+						}
+						$res = null;
+						$this->template('page-gallery');
+					}
+					else {
+						$sql = 'SELECT i_id, i_uri, i_title, i_width, i_height FROM ' . SJONSITE_PDO_PREFIX . 'images WHERE i_parent = ' . $this->db->quote(Sjonsite_Model::PAGE) . ' AND i_parent_id = ' . $this->db->quote($this->pagePage->p_id);
+						$res = $this->db->query($sql);
+						while ($res && $row = $res->fetch(PDO::FETCH_ASSOC)) {
+							$this->pageImages[$row['i_id']] = new Sjonsite_ImagesModel($row);
+						}
+						$res = null;
+						$this->template('page-content'); // page-gallery
+					}
+				}
+				else {
+					$res = null;
+					throw new Exception('Page not found' . $sql, 404);
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -116,7 +231,7 @@
 				$res = $this->db->query($sql);
 				$this->menuItems = array();
 				while ($res && $row = $res->fetch(PDO::FETCH_ASSOC)) {
-					if (empty($this->menuItems[$row['p1_id']])) {
+					if (empty($this->menuItems[$row['p1_id']]) && $row['p1_id']) {
 						$this->menuItems[$row['p1_id']] = array(
 							'parent' => $row['p1_pid'],
 							'uri' => $row['p1_uri'],
@@ -125,7 +240,7 @@
 							'children' => array()
 						);
 					}
-					if (empty($this->menuItems[$row['p1_id']]['children'][$row['p2_id']])) {
+					if (empty($this->menuItems[$row['p1_id']]['children'][$row['p2_id']]) && $row['p2_id']) {
 						$this->menuItems[$row['p1_id']]['children'][$row['p2_id']] = array(
 							'parent' => $row['p2_pid'],
 							'uri' => $row['p2_uri'],
@@ -134,7 +249,7 @@
 							'children' => array()
 						);
 					}
-					if (empty($this->menuItems[$row['p1_id']]['children'][$row['p2_id']]['children'][$row['p3_id']])) {
+					if (empty($this->menuItems[$row['p1_id']]['children'][$row['p2_id']]['children'][$row['p3_id']]) && $row['p3_id']) {
 						$this->menuItems[$row['p1_id']]['children'][$row['p2_id']]['children'][$row['p3_id']] = array(
 							'parent' => $row['p3_pid'],
 							'uri' => $row['p3_uri'],
@@ -151,11 +266,20 @@
 			}
 		}
 
+		/**
+		 * Is the current user an admin user
+		 *
+		 * @return bool
+		 */
+		public function isAdmin () {
+			return false;
+		}
+
 	}
 
 	/**
 	 * Run
 	 */
-	new Sjonsite;
+	new Sjonsite();
 
 ?>

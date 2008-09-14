@@ -54,6 +54,9 @@
 				$_SERVER['REQUEST_URI'] = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
 			}
 			$this->request = str_replace(array('//', '//'), '/', '/' . preg_replace('#[^a-z0-9\_\-\/\.]#', null, strtolower($_SERVER['REQUEST_URI'])));
+			if (substr($this->request, -1, 1) == '/' && strlen($this->request) > 1) {
+				$this->request = substr($this->request, 0, -1);
+			}
 			try {
 				$this->db = new PDO(SJONSITE_PDO_DSN, SJONSITE_PDO_USER, SJONSITE_PDO_PASS, array(PDO::ATTR_PERSISTENT => true));
 				$this->db->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
@@ -70,7 +73,7 @@
 				$_SESSION['messages'] = array();
 			}
 			if (!ini_get('zlib.output_compression')) {
-				ob_start('ob_gzhandler');
+				//ob_start('ob_gzhandler');
 			}
 			try {
 				$this->settings = new Sjonsite_Settings($this->db);
@@ -495,14 +498,25 @@
 		 */
 		public function __construct ($table, $row = null) {
 			$this->_table = SJONSITE_PDO_PREFIX . $table;
-			$this->_fields = $fields;
 			if (is_array($row)) {
 				foreach ($this->_fields as $field) {
 					if (array_key_exists($field, $row)) {
 						$this->$field = $row[$field];
 					}
+					else {
+						$this->$field = null;
+					}
 				}
 			}
+		}
+
+		/**
+		 * Return the full name of the table
+		 *
+		 * @return string
+		 */
+		public function table () {
+			return $this->_table;
 		}
 
 	}
@@ -528,8 +542,9 @@
 		 */
 		public function __construct ($db) {
 			$sql = 'SELECT s_name AS name, s_value AS value FROM ' . SJONSITE_PDO_PREFIX . 'settings';
-			$res = $this->db->query($sql);
-			while ($res && $row = $res->fetch(PDO::FETCH_OBJECT)) {
+			$res = $db->query($sql);
+			$this->settings = array();
+			while ($res && $row = $res->fetch(PDO::FETCH_OBJ)) {
 				$this->settings[$row->name] = unserialize($row->value);
 			}
 			$res = null;
@@ -551,7 +566,7 @@
 				$res = $db->prepare($sql);
 				if ($res->execute(array(
 					':name' => $name,
-					':value' => $value
+					':value' => serialize($value)
 				))) {
 					$db->commit();
 					$res = null;
@@ -584,7 +599,7 @@
 				$res = $db->prepare($sql);
 				if ($res->execute(array(
 					':name' => $name,
-					':value' => $value
+					':value' => serialize($value)
 				))) {
 					$db->commit();
 					$res = null;
