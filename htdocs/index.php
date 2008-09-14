@@ -54,12 +54,50 @@
 		protected function doContact () {
 			try {
 				$this->preparePage();
-				$this->settings->remoteHash = sha1($_SERVER['REMOTE_ADDR'] . $this->settings->secretHash . $_SERVER['HTTP_USER_AGENT']);
-				if ($this->ispost()) {
-
-					$mail = $this->template('mail-contact', true);
+				if (empty($this->settings->secretHash)) $this->settings->insert($this->db, 'secretHash', sha1(mt_rand() . serialize($_SERVER)));
+				$this->contactHash = sha1($_SERVER['REMOTE_ADDR'] . $this->settings->secretHash . $_SERVER['HTTP_USER_AGENT']);
+				$this->contactSubmitted = false;
+				$this->contactSuccess = false;
+				$this->contactErrors = array();
+				$this->contactName = $this->param('name');
+				$this->contactEmail = $this->param('email');
+				$this->contactMessage = $this->param('message');
+				if ($this->ispost() && ($this->param('hash') == $this->contactHash)) {
+					$this->contactSubmitted = true;
+					if (empty($this->contactName) || (str_replace(array("\r", "\n"), null, $this->contactName) != $this->contactName)) {
+						$this->contactErrors['name'] = true;
+					}
+					if (empty($this->contactEmail) || !$this->isemail($this->contactEmail)) {
+						$this->contactErrors['email'] = true;
+						$this->contactEmail = null;
+					}
+					if (empty($this->contactMessage)) {
+						$this->contactErrors['message'] = true;
+					}
+					if (empty($this->settings->contactTo)) $this->settings->insert($this->db, 'contactTo', 'info@example.org');
+					if (empty($this->settings->contactFrom)) $this->settings->insert($this->db, 'contactFrom', 'noreply@example.org');
+					if (empty($this->settings->contactSubject)) $this->settings->insert($this->db, 'contactSubject', 'Contact Form E-mail');
+					if (count($this->contactErrors) == 0) {
+						$message = implode("\n", array(
+							'Mail from the contactform on your website.',
+							null,
+							'Name: ' . $this->contactName,
+							'E-mail: ' . $this->contactEmail,
+							'Message:',
+							$this->contactMessage,
+							null,
+							'Remote:',
+							$_SERVER['REMOTE_ADDR'],
+							$_SERVER['HTTP_USER_AGENT']
+						));
+						$headers = implode("\n", array(
+							'From: ' . $this->settings->contactFrom,
+							'Reply-To: ' . $this->contactEmail,
+							'Content-Type: text/plain; charset=UTF-8'
+						));
+						$this->contactSuccess = mail($this->settings->contactTo, $this->settings->contactSubject, $message, $headers);
+					}
 				}
-				// prepare data
 				$this->template('page-contact');
 			}
 			catch (Exception $e) {
