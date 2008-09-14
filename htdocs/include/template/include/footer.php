@@ -10,7 +10,9 @@
 	 * @version $Id$
 	 */
 
+	$this->template('include/menu');
 ?>
+			<p id="server-stats">time: <?php printf('%0.3fs', (microtime(true) - SJONSITE_START)); ?> memory: <?php printf('%d KiB', memory_get_usage() / 1024); ?></p>
 		</div>
 	</body>
 </html>
