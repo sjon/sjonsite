@@ -92,6 +92,38 @@
 			}
 		}
 
+		const authPages = 1;
+
+		const authGallery = 2;
+
+		const authUsers = 4;
+
+		protected function checkAuth ($requiredLevel = 7) {
+			if (empty($_SESSION['adminData'])) {
+				$_SESSION['adminFlag'] = false;
+				$_SESSION['adminData'] = new Sjonsite_UsersModel();
+			}
+			if ($this->param('authLogin')) {
+				try {
+					$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'users WHERE u_email = ' . $this->db->quote($this->param('authLogin'));
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
+					$row = $res->fetch(PDO::FETCH_CLASS);
+					$res = null;
+					if ($row->u_id > 0 && $row->u_passwd == sha1($this->param('authPasswd'))) {
+						$_SESSION['adminData'] = $row;
+					}
+				}
+				catch (Exception $e) {
+					$this->ex = $e;
+					$this->template('system-error');
+				}
+			}
+			if ($_SESSION['adminData']->u_id > 0) {
+				return ($_SESSION['adminData'] & $requiredLevel);
+			}
+			return false;
+		}
+
 		/**
 		 * Handle adding pages
 		 *
@@ -291,7 +323,7 @@
 		 */
 		protected function doLogout () {
 			$_SESSION['adminFlag'] = false;
-			$_SESSION['adminHash'] = null;
+			$_SESSION['adminData'] = null;
 			$this->redirect('/');
 		}
 
@@ -317,7 +349,7 @@
 		 * @return bool
 		 */
 		public function isAdmin () {
-			return true;
+			return $_SESSION['adminFlag'];
 		}
 
 	}
@@ -325,6 +357,6 @@
 	/**
 	 * Run
 	 */
-	new Sjonsite_Admin;
+	new Sjonsite_Admin();
 
 ?>
