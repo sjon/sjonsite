@@ -47,6 +47,62 @@
 		}
 
 		/**
+		 * Form hash
+		 *
+		 * @var string
+		 * @see doContact()
+		 */
+		protected $contactHash;
+
+		/**
+		 * Is the form submitted
+		 *
+		 * @var bool
+		 * @see doContact()
+		 */
+		protected $contactSubmitted;
+
+		/**
+		 * Has the form been sent
+		 *
+		 * @var bool
+		 * @see doContact()
+		 */
+		protected $contactSuccess;
+
+		/**
+		 * Array of errors
+		 *
+		 * @var array
+		 * @see doContact()
+		 */
+		protected $contactErrors;
+
+		/**
+		 * The submitted name
+		 *
+		 * @var string
+		 * @see doContact()
+		 */
+		protected $contactName;
+
+		/**
+		 * The submitted email address
+		 *
+		 * @var string
+		 * @see doContact()
+		 */
+		protected $contactEmail;
+
+		/**
+		 * The submitted message
+		 *
+		 * @var string
+		 * @see doContact()
+		 */
+		protected $contactMessage;
+
+		/**
 		 * Handle contact request
 		 *
 		 * @return void
@@ -243,7 +299,7 @@
 							$this->pageImages[$row['i_id']] = new Sjonsite_ImagesModel($row);
 						}
 						$res = null;
-						$this->template('page-content'); // page-gallery
+						$this->template('page-content');
 					}
 				}
 				else {

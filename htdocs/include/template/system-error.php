@@ -38,4 +38,6 @@
 <?php
 	}
 	$this->template('include/footer');
+	unset($this);
+	exit;
 ?>
