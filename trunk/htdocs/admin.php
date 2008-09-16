@@ -92,12 +92,38 @@
 			}
 		}
 
+		/**
+		 * Has auth for pages
+		 *
+		 * @var int
+		 * @see checkAuth()
+		 */
 		const authPages = 1;
 
+		/**
+		 * Has auth for pages
+		 *
+		 * @var int
+		 * @see checkAuth()
+		 */
 		const authGallery = 2;
 
+		/**
+		 * Has auth for pages
+		 *
+		 * @var int
+		 * @see checkAuth()
+		 */
 		const authUsers = 4;
 
+		/**
+		 * Check authentication & authorization
+		 * Returns true if the current user has & can
+		 * Loads the admin-login template and returns false otherwise
+		 *
+		 * @param constant $requiredLevel
+		 * @return bool
+		 */
 		protected function checkAuth ($requiredLevel = 7) {
 			if (empty($_SESSION['adminData'])) {
 				$_SESSION['adminFlag'] = false;
@@ -109,18 +135,22 @@
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
 					$row = $res->fetch(PDO::FETCH_CLASS);
 					$res = null;
-					if ($row->u_id > 0 && $row->u_passwd == sha1($this->param('authPasswd'))) {
+					if (($row instanceof Sjonsite_UsersModel) && ($row->u_id > 0) && ($row->u_passwd == sha1($this->param('authPasswd')))) {
+						$_SESSION['adminFlag'] = true;
 						$_SESSION['adminData'] = $row;
 					}
 				}
 				catch (Exception $e) {
-					$this->ex = $e;
-					$this->template('system-error');
+					unset($_SESSION['adminData']);
+					throw new Exception($e->getMessage(), $e->getCode());
 				}
 			}
 			if ($_SESSION['adminData']->u_id > 0) {
-				return ($_SESSION['adminData'] & $requiredLevel);
+				if (($_SESSION['adminData']->u_level & $requiredLevel) == $requiredLevel) {
+					return true;
+				}
 			}
+			$this->template('admin-login');
 			return false;
 		}
 
@@ -131,8 +161,10 @@
 		 */
 		protected function doPagesAdd () {
 			try {
-				// prepare data
-				$this->template('admin-pages-form');
+				if ($this->checkAuth(self::authPages)) {
+
+					$this->template('admin-pages-form');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -147,8 +179,10 @@
 		 */
 		protected function doPagesEdit () {
 			try {
-				// prepare data
-				$this->template('admin-pages-form');
+				if ($this->checkAuth(self::authPages)) {
+
+					$this->template('admin-pages-form');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -163,8 +197,10 @@
 		 */
 		protected function doPagesRemove () {
 			try {
-				// prepare data
-				$this->template('admin-message');
+				if ($this->checkAuth(self::authPages)) {
+
+					$this->template('admin-message');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -179,8 +215,10 @@
 		 */
 		protected function doPagesList () {
 			try {
-				// prepare data
-				$this->template('admin-pages');
+				if ($this->checkAuth(self::authPages)) {
+
+					$this->template('admin-pages');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
