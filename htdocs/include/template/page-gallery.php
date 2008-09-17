@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * Sjonsite Template - Page Gallery
+	 * Sjonsite Template - Gallery page
 	 *
 	 * @author Sjon <sjonscom@gmail.com>
 	 * @package Sjonsite
@@ -11,7 +11,11 @@
 	 */
 
 	$this->template('include/header');
-
-
+?>
+			<div id="main">
+				<h1>Gallery Page</h1>
+				<p>Lorum ipsum dolor sit amet</p>
+			</div>
+<?php
 	$this->template('include/footer');
 ?>
