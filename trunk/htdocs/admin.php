@@ -336,7 +336,9 @@
 		protected function doUsersAdd () {
 			try {
 				if ($this->checkAuth(self::authUsers)) {
+					$this->formData = new Sjonsite_UsersModel();
 
+					$this->formAction = 'add';
 					$this->template('admin-users-form');
 				}
 			}
@@ -354,7 +356,10 @@
 		protected function doUsersEdit () {
 			try {
 				if ($this->checkAuth(self::authUsers)) {
+					$this->formData = new Sjonsite_UsersModel();
+					// $u_id = $this->pathPart(4);
 
+					$this->formAction = 'edit/' . $this->formData->u_id;
 					$this->template('admin-users-form');
 				}
 			}
