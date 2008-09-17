@@ -22,8 +22,8 @@
 ?>
 		<link rel="stylesheet" type="text/css" media="screen" href="/css/screen-admin.css" />
 		<link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
-		<script type="text/javascript" src="/js/jquery-wymeditor-0.5.a.pack.js"></script>
 		<script type="text/javascript" src="/js/jquery-1.2.6.pack.js"></script>
+		<script type="text/javascript" src="/js/jquery-wymeditor-0.5.a.pack.js"></script>
 		<script type="text/javascript" src="/js/library-admin.js"></script>
 		<title><?php echo (isset($this->title) ? $this->out($this->title) : 'Sjonsite Admin'); ?></title>
 <?php
