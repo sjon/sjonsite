@@ -28,6 +28,20 @@
 	final class Sjonsite_Admin extends Sjonsite_Base {
 
 		/**
+		 * The action of the form element
+		 *
+		 * @var string
+		 */
+		protected $formAction;
+
+		/**
+		 * Any errors found with the form submission
+		 *
+		 * @var array
+		 */
+		protected $formErrors;
+
+		/**
 		 * Process request
 		 *
 		 * @return void
@@ -151,7 +165,7 @@
 						$_SESSION['adminData'] = $row;
 					}
 					else {
-						$this->setMessage('Ongeldige invoer', self::error);
+						$this->setMessage('Invalid input', self::error);
 						sleep(2);
 					}
 				}
@@ -329,6 +343,13 @@
 		}
 
 		/**
+		 * Userform data object
+		 *
+		 * @var Sjonsite_UsersModel
+		 */
+		protected $userformData;
+
+		/**
 		 * Handle adding users
 		 *
 		 * @return void
@@ -336,9 +357,11 @@
 		protected function doUsersAdd () {
 			try {
 				if ($this->checkAuth(self::authUsers)) {
-					$this->formData = new Sjonsite_UsersModel();
-
+					$this->userformData = new Sjonsite_UsersModel();
 					$this->formAction = 'add';
+					$this->formErrors = array();
+					if ($this->ispost()) {
+					}
 					$this->template('admin-users-form');
 				}
 			}
@@ -356,11 +379,58 @@
 		protected function doUsersEdit () {
 			try {
 				if ($this->checkAuth(self::authUsers)) {
-					$this->formData = new Sjonsite_UsersModel();
-					// $u_id = $this->pathPart(4);
-
-					$this->formAction = 'edit/' . $this->formData->u_id;
-					$this->template('admin-users-form');
+					$this->userformData = new Sjonsite_UsersModel();
+					$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'users WHERE u_id = ' . $this->db->quote($this->pathPart(4));
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
+					if ($res && $this->userformData = $res->fetch(PDO::FETCH_CLASS)) {
+						$this->formAction = 'edit/' . $this->userformData->u_id;
+						$this->formErrors = array();
+						if ($this->ispost()) {
+							$this->userformData->u_name = $this->param('u_name');
+							if (empty($this->userformData->u_name)) {
+								$this->formErrors['u_name'] = true;
+								$this->setMessage('You need to fill in a name!', self::error);
+							}
+							$this->userformData->u_email = $this->param('u_email');
+							if (!$this->isemail($this->userformData->u_email)) {
+								$this->formErrors['u_email'] = true;
+								$this->userformData->u_email = null;
+								$this->setMessage('You need to fill in an email!', self::error);
+							}
+							// check email is unique
+							if ($this->param('u_passwd')) {
+								$passwd = $this->param('u_passwd');
+								$passwd_check = $this->param('u_passwd_check');
+								if (empty($passwd_check) || ($passwd != $passwd_check)) {
+									$this->formErrors['u_email'] = true;
+									$this->setMessage('If you want to change the password, fill it out the same twice!', self::error);
+								}
+								else {
+									$this->userformData->u_passwd = sha1($passwd);
+								}
+							}
+							$u_level = $this->param('u_level');
+							$level = 0;
+							if (is_array($u_level) && count($u_level)) {
+								foreach ($u_level as $value) {
+									$level += $value;
+								}
+							}
+							if ($level == 0) {
+								$this->formErrors['u_level'] = true;
+								$this->setMessage('A user needs at least one level of authorisation!', self::error);
+							}
+							else {
+								$this->userformData->u_level = $level;
+							}
+							$this->userformData->u_state = $this->param('u_state');
+							// update
+						}
+						$this->template('admin-users-form');
+					}
+					else {
+						throw new Exception('Unknown user selected');
+					}
 				}
 			}
 			catch (Exception $e) {
