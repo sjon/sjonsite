@@ -29,7 +29,7 @@
 	 *
 	 * @var string
 	 */
-	define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonsite');
+	define ('SJONSITE_PDO_DSN', 'mysql:host=192.168.1.1;port=3306;dbname=test');
 
 	/**
 	 * PDO connection username

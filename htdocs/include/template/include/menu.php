@@ -19,10 +19,10 @@
 	 */
 	function isCurrent ($item, $request) {
 		if ($item['uri'] == $request) return true;
-		if (count($item['children'])) {
+		if (isset($item['children']) && count($item['children'])) {
 			foreach ($item['children'] as $child) {
 				if ($child['uri'] == $request) return true;
-				if (count($child['children'])) {
+				if (isset($child['children']) && count($child['children'])) {
 					foreach ($child['children'] as $subChild) {
 						if ($subChild['uri'] == $request) return true;
 					}
@@ -133,6 +133,7 @@
 					<li><a href="/admin/pages">Pages</a></li>
 					<li><a href="/admin/gallery">Gallery</a></li>
 					<li><a href="/admin/users">Users</a></li>
+					<li><a href="/admin/settings">Settings</a></li>
 					<li><a href="/admin/logout">Logout</a></li>
 				</ul>
 			</div>
