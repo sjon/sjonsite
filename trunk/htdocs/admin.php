@@ -33,7 +33,7 @@
 		 * @return void
 		 */
 		public function processRequest () {
-			// check auth
+			$this->menuItems = array();
 			switch ($this->pathPart(2)) {
 				case 'pages':
 					switch ($this->pathPart(3)) {
@@ -83,6 +83,9 @@
 							break;
 					}
 					break;
+				case 'settings':
+					$this->doSettings();
+					break;
 				case 'logout':
 					$this->doLogout();
 					break;
@@ -117,6 +120,14 @@
 		const authUsers = 4;
 
 		/**
+		 * Has auth for settings
+		 *
+		 * @var int
+		 * @see checkAuth()
+		 */
+		const authSettings = 8;
+
+		/**
 		 * Check authentication & authorization
 		 * Returns true if the current user has & can
 		 * Loads the admin-login template and returns false otherwise
@@ -124,12 +135,12 @@
 		 * @param constant $requiredLevel
 		 * @return bool
 		 */
-		protected function checkAuth ($requiredLevel = 7) {
+		protected function checkAuth ($requiredLevel = 7, $strict = true) {
 			if (empty($_SESSION['adminData'])) {
 				$_SESSION['adminFlag'] = false;
 				$_SESSION['adminData'] = new Sjonsite_UsersModel();
 			}
-			if ($this->param('authLogin')) {
+			if ($this->param('authLogin', false) !== false) {
 				try {
 					$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'users WHERE u_email = ' . $this->db->quote($this->param('authLogin'));
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
@@ -139,6 +150,10 @@
 						$_SESSION['adminFlag'] = true;
 						$_SESSION['adminData'] = $row;
 					}
+					else {
+						$this->setMessage('Ongeldige invoer', self::error);
+						sleep(2);
+					}
 				}
 				catch (Exception $e) {
 					unset($_SESSION['adminData']);
@@ -147,6 +162,9 @@
 			}
 			if ($_SESSION['adminData']->u_id > 0) {
 				if (($_SESSION['adminData']->u_level & $requiredLevel) == $requiredLevel) {
+					return true;
+				}
+				if (($strict === false) && (($_SESSION['adminData']->u_level & $requiredLevel) > 0)) {
 					return true;
 				}
 			}
@@ -216,7 +234,13 @@
 		protected function doPagesList () {
 			try {
 				if ($this->checkAuth(self::authPages)) {
-
+					$sql = 'SELECT p_id, p_uri, p_title, p_gallery, p_state FROM ' . SJONSITE_PDO_PREFIX . 'pages ORDER BY p_uri';
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_PagesModel');
+					$this->pagesList = array();
+					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {
+						$this->pagesList[] = $row;
+					}
+					$res = null;
 					$this->template('admin-pages');
 				}
 			}
@@ -233,8 +257,10 @@
 		 */
 		protected function doGalleryAdd () {
 			try {
-				// prepare data
-				$this->template('admin-gallery-form');
+				if ($this->checkAuth(self::authGallery)) {
+
+					$this->template('admin-gallery-form');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -249,8 +275,10 @@
 		 */
 		protected function doGalleryEdit () {
 			try {
-				// prepare data
-				$this->template('admin-gallery-form');
+				if ($this->checkAuth(self::authGallery)) {
+
+					$this->template('admin-gallery-form');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -265,8 +293,10 @@
 		 */
 		protected function doGalleryRemove () {
 			try {
-				// prepare data
-				$this->template('admin-message');
+				if ($this->checkAuth(self::authGallery)) {
+
+					$this->template('admin-message');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -281,8 +311,16 @@
 		 */
 		protected function doGalleryList () {
 			try {
-				// prepare data
-				$this->template('admin-gallery');
+				if ($this->checkAuth(self::authGallery)) {
+					$sql = 'SELECT g_id, g_page, g_title FROM ' . SJONSITE_PDO_PREFIX . 'gallery ORDER BY g_title';
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_GalleryModel');
+					$this->galleryList = array();
+					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {
+						$this->galleryList[] = $row;
+					}
+					$res = null;
+					$this->template('admin-gallery');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -297,8 +335,10 @@
 		 */
 		protected function doUsersAdd () {
 			try {
-				// prepare data
-				$this->template('admin-users-form');
+				if ($this->checkAuth(self::authUsers)) {
+
+					$this->template('admin-users-form');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -313,8 +353,10 @@
 		 */
 		protected function doUsersEdit () {
 			try {
-				// prepare data
-				$this->template('admin-users-form');
+				if ($this->checkAuth(self::authUsers)) {
+
+					$this->template('admin-users-form');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -329,8 +371,10 @@
 		 */
 		protected function doUsersRemove () {
 			try {
-				// prepare data
-				$this->template('admin-message');
+				if ($this->checkAuth(self::authUsers)) {
+
+					$this->template('admin-message');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -345,8 +389,41 @@
 		 */
 		protected function doUsersList () {
 			try {
-				// prepare data
-				$this->template('admin-users');
+				if ($this->checkAuth(self::authUsers)) {
+					$sql = 'SELECT u_id, u_name, u_email, u_level, u_state FROM ' . SJONSITE_PDO_PREFIX . 'users ORDER BY u_name';
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
+					$this->usersList = array();
+					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {
+						$this->usersList[] = $row;
+					}
+					$res = null;
+					$this->template('admin-users');
+				}
+			}
+			catch (Exception $e) {
+				$this->ex = $e;
+				$this->template('system-error');
+			}
+		}
+
+		/**
+		 * Handle settings page
+		 *
+		 * @return void
+		 */
+		protected function doSettings () {
+			try {
+				if ($this->checkAuth(self::authSettings)) {
+					if ($this->ispost()) {
+						foreach ($this->settings->getAll() as $name => $value) {
+							if ($this->param($name) != $value) {
+								$this->settings->update($this->db, $name, $this->param($name));
+							}
+						}
+						$this->setMessage('Settings updated');
+					}
+					$this->template('admin-settings');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;
@@ -372,8 +449,25 @@
 		 */
 		protected function doAdmin () {
 			try {
-				// prepare data
-				$this->template('admin-home');
+				if ($this->checkAuth((self::authPages | self::authGallery | self::authUsers), false)) {
+					$sql = 'SELECT p_state, COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'pages GROUP BY p_state';
+					$res = $this->db->query($sql);
+					$this->pagesCount = $res->fetch(PDO::FETCH_ASSOC);
+					$res = null;
+					$sql = 'SELECT COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'gallery';
+					$res = $this->db->query($sql);
+					$this->galleryCount = $res->fetch(PDO::FETCH_ASSOC);
+					$res = null;
+					$sql = 'SELECT i_parent, COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'images GROUP BY i_parent';
+					$res = $this->db->query($sql);
+					$this->imagesCount = $res->fetch(PDO::FETCH_ASSOC);
+					$res = null;
+					$sql = 'SELECT u_state, COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'users GROUP BY u_state';
+					$res = $this->db->query($sql);
+					$this->adminPages = $res->fetch(PDO::FETCH_ASSOC);
+					$res = null;
+					$this->template('admin-home');
+				}
 			}
 			catch (Exception $e) {
 				$this->ex = $e;

@@ -110,7 +110,6 @@
 		protected function doContact () {
 			try {
 				$this->preparePage();
-				if (empty($this->settings->secretHash)) $this->settings->insert($this->db, 'secretHash', sha1(mt_rand() . serialize($_SERVER)));
 				$this->contactHash = sha1($_SERVER['REMOTE_ADDR'] . $this->settings->secretHash . $_SERVER['HTTP_USER_AGENT']);
 				$this->contactSubmitted = false;
 				$this->contactSuccess = false;
@@ -130,9 +129,6 @@
 					if (empty($this->contactMessage)) {
 						$this->contactErrors['message'] = true;
 					}
-					if (empty($this->settings->contactTo)) $this->settings->insert($this->db, 'contactTo', 'info@example.org');
-					if (empty($this->settings->contactFrom)) $this->settings->insert($this->db, 'contactFrom', 'noreply@example.org');
-					if (empty($this->settings->contactSubject)) $this->settings->insert($this->db, 'contactSubject', 'Contact Form E-mail');
 					if (count($this->contactErrors) == 0) {
 						$message = implode("\n", array(
 							'Mail from the contactform on your website.',
@@ -215,9 +211,6 @@
 				$this->searchResults = array();
 				$this->searchPage = $this->param('p', 1);
 				$this->searchPages = 0;
-				if (empty($this->settings->searchPerPage)) {
-					$this->settings->insert($this->db, 'searchPerPage', 10);
-				}
 				if ($this->searchQuery) {
 					$sql = 'SELECT COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE (p_title LIKE ' . $this->db->quote('%' . $this->searchQuery . '%') . ' OR p_summary LIKE ' . $this->db->quote('%' . $this->searchQuery . '%') . ') AND p_state = ' . $this->db->quote(Sjonsite_Model::ACTIVE);
 					$res = $this->db->query($sql);
@@ -348,7 +341,8 @@
 							'parent' => $row['p3_pid'],
 							'uri' => $row['p3_uri'],
 							'title' => $row['p3_title'],
-							'state' => $row['p3_state']
+							'state' => $row['p3_state'],
+							'children' => array()
 						);
 					}
 				}

@@ -22,7 +22,7 @@
 <?php
 			foreach ($this->searchResults as $result) {
 ?>
-				<div id="search-result-<?php echo md5($result['uri']); ?>">
+				<div id="search-result-<?php echo md5($result['p_uri']); ?>">
 					<h2><a href="<?php echo $this->out($result['p_uri']); ?>"><?php echo $this->out($result['p_title']); ?></a></h2>
 					<p><?php echo $this->out($result['p_summary']); ?></p>
 				</div>

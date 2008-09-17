@@ -617,6 +617,15 @@
 		}
 
 		/**
+		 * Return all settings
+		 *
+		 * @return array
+		 */
+		public function getAll () {
+			return $this->settings;
+		}
+
+		/**
 		 * Overloading getter
 		 *
 		 * @param string $name
