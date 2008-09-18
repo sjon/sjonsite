@@ -194,6 +194,11 @@
 		protected function doPagesAdd () {
 			try {
 				if ($this->checkAuth(self::authPages)) {
+					$this->pageformData = new Sjonsite_PagesModel();
+					$this->formAction = 'add';
+					$this->formErrors = array();
+					if ($this->ispost()) {
+					}
 
 					$this->template('admin-pages-form');
 				}
