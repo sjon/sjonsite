@@ -22,10 +22,12 @@
 ?>
 		<link rel="stylesheet" type="text/css" media="screen" href="/css/screen-admin.css" />
 		<link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
+		<title><?php echo (isset($this->title) ? $this->out($this->title) : 'Sjonsite Admin'); ?></title>
 		<script type="text/javascript" src="/js/jquery-1.2.6.pack.js"></script>
 		<script type="text/javascript" src="/js/jquery-wymeditor-0.5.a.pack.js"></script>
 		<script type="text/javascript" src="/js/library-admin.js"></script>
-		<title><?php echo (isset($this->title) ? $this->out($this->title) : 'Sjonsite Admin'); ?></title>
+		<link rel="icon" type="image/x-icon" href="/img/sjonsite.ico" />
+		<link rel="shortcut icon" type="image/x-icon" href="/img/sjonsite.ico" />
 <?php
 	}
 	else {
@@ -34,9 +36,11 @@
 		<meta name="keywords" content="<?php echo (isset($this->keywords) ? $this->out($this->keywords) : null); ?>" />
 		<link rel="stylesheet" type="text/css" media="screen" href="/css/screen.css" />
 		<link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
+		<title><?php echo (isset($this->title) ? $this->out($this->title) : 'Sjonsite'); ?></title>
 		<script type="text/javascript" src="/js/jquery-1.2.6.pack.js"></script>
 		<script type="text/javascript" src="/js/library.js"></script>
-		<title><?php echo (isset($this->title) ? $this->out($this->title) : 'Sjonsite'); ?></title>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
 <?php
 	}
 ?>

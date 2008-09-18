@@ -11,13 +11,6 @@
 	 */
 
 	$this->template('include/header');
-	/*	u_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	u_name VARCHAR (255) NOT NULL,
-	u_email VARCHAR (255) NOT NULL,
-	u_passwd CHAR (40) NOT NULL,
-	u_level SMALLINT UNSIGNED NOT NULL,
-	u_state ENUM ('A', 'S', 'R', 'U') NOT NULL DEFAULT 'U',
-*/
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
