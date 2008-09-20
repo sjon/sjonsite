@@ -8,3 +8,87 @@
  * @version $Id$
  */
 
+body {
+	font-family : Verdana, serif;
+	font-size: 1em;
+}
+
+img {
+	border : none;
+}
+
+#container {
+	border: 0px solid black;
+	width: 900px;
+	margin: 0 auto 0 auto;
+}
+
+#main {
+	position: relative;
+	top: 25px;
+	left: 10px;
+}
+
+#main table {
+	width: 100%;
+}
+
+#main table th {
+	border: 1px solid #000;
+	background-color: #dde;
+	color: #000;
+	font-size: 0.9em;
+	font-weight: bold;
+}
+
+#main table td {
+	border: 1px solid #eee;
+	background-color: #fff;
+	color: #000;
+	font-size: 0.8em;
+}
+
+#main table tr.even td {
+	background-color: #ffe;
+}
+
+#main table .center {
+	text-align: center;
+}
+
+#admin-menu {
+	position: absolute;
+	top: 5px;
+}
+
+#admin-menu ul {
+	margin: 0;
+	padding: 0;
+	margin-left: 10px;
+	margin-top: 10px;
+}
+
+#admin-menu li {
+	display : inline;
+	/*margin-right : 0.5em;*/
+}
+
+#admin-menu a {
+	color : #039;
+	font-size : 0.8em;
+	font-weight : bold;
+	text-decoration : none;
+}
+
+#admin-menu li img {
+	margin-right : 0.2em;
+}
+
+#system-stats {
+	position: relative;
+	margin-top: 25px;
+	margin-right: 10px;
+	width: 900px;
+	font-size: 0.6em;
+	text-align: right;
+}

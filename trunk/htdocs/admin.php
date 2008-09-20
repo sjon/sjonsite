@@ -150,6 +150,7 @@
 		 * @return bool
 		 */
 		protected function checkAuth ($requiredLevel = 7, $strict = true) {
+			$this->requiredLevel = $requiredLevel;
 			if (empty($_SESSION['adminData'])) {
 				$_SESSION['adminFlag'] = false;
 				$_SESSION['adminData'] = new Sjonsite_UsersModel();
@@ -187,6 +188,13 @@
 		}
 
 		/**
+		 * Pagesform data object
+		 *
+		 * @var Sjonsite_PagesModel
+		 */
+		protected $pagesformData;
+
+		/**
 		 * Handle adding pages
 		 *
 		 * @return void
@@ -195,11 +203,52 @@
 			try {
 				if ($this->checkAuth(self::authPages)) {
 					$this->pageformData = new Sjonsite_PagesModel();
+					$this->pageformData->p_pid = $this->param('p_pid', null);
+					$this->pageformData->p_title = $this->param('p_title', null);
 					$this->formAction = 'add';
 					$this->formErrors = array();
 					if ($this->ispost()) {
+						$type = $this->param('type', 'content');
+						$sql = 'SELECT MAX(p_sorting) AS sort FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE p_pid ' . (is_null($this->pageformData->p_pid) ? 'IS NULL' : '= ' . $this->db->quote($this->pageformData->p_pid));
+						$res = $this->db->query($sql);
+						$this->pageformData->p_sorting = ($res->fetchColumn() + 1);
+						$res = null;
+						if ($type == 'gallery') {
+							$sql = 'INSERT INTO ' . SJONSITE_PDO_PREFIX . 'gallery (g_id, g_page, g_title, g_summary) VALUES (NULL, NULL, :title, NULL)';
+							$res = $this->db->prepare($sql);
+							$res->execute(array(
+								':title' => 'Gallery for ' . $this->pageformData->p_title
+							));
+							$this->pageformData->p_gallery = $this->db->lastInsertId();
+							$res = null;
+						}
+						$uri = null;
+						if (!is_null($this->pageformData->p_pid)) {
+							$sql = 'SELECT p_uri AS uri FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE p_id = ' . $this->db->quote($this->pageformData->p_pid);
+							$res = $this->db->query($sql);
+							$uri = $res->fetchColumn();
+							$res = null;
+						}
+						$uri .= '/' . $this->normalize($this->pageformData->p_title);
+						$sql = 'INSERT INTO ' . SJONSITE_PDO_PREFIX . 'pages (p_id, p_pid, p_uri, p_title, p_gallery, p_sorting, p_state) VALUES (NULL, :pid, :uri, :title, :gallery, :sorting, :state)';
+						$res = $this->db->prepare($sql);
+						$res->execute(array(
+							':pid' => $this->pageformData->p_pid,
+							':uri' => $uri,
+							':title' => $this->pageformData->p_title,
+							':gallery' => $this->pageformData->p_gallery,
+							':sorting' => $this->pageformData->p_sorting,
+							':state' => Sjonsite_Model::SUSPENDED
+						));
+						$this->pageformData->p_id = $this->db->lastInsertId();
+						$res = null;
+						if ($this->pageformData->p_gallery > 0) {
+							$sql = 'UPDATE ' . SJONSITE_PDO_PREFIX . 'gallery SET g_page = ' . $this->db->quote($this->pageformData->p_id) . ' WHERE g_id = ' . $this->db->quote($this->pageformData->p_gallery);
+							$res = $this->db->exec($sql);
+						}
+						$this->setMessage('Page added');
+						$this->redirect('/admin/pages/edit/' . $this->pageformData->p_id);
 					}
-
 					$this->template('admin-pages-form');
 				}
 			}
@@ -217,8 +266,19 @@
 		protected function doPagesEdit () {
 			try {
 				if ($this->checkAuth(self::authPages)) {
-
-					$this->template('admin-pages-form');
+					$this->pageformData = new Sjonsite_PagesModel();
+					$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE p_id = ' . $this->db->quote($this->pathPart(4));
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_PagesModel');
+					if ($res && $this->pageformData = $res->fetch(PDO::FETCH_CLASS)) {
+						$this->formAction = 'edit/' . $this->pageformData->p_id;
+						$this->formErrors = array();
+						if ($this->ispost()) {
+						}
+						$this->template('admin-pages-form');
+					}
+					else {
+						throw new Exception('Unknown page selected');
+					}
 				}
 			}
 			catch (Exception $e) {
@@ -253,13 +313,16 @@
 		protected function doPagesList () {
 			try {
 				if ($this->checkAuth(self::authPages)) {
-					$sql = 'SELECT p_id, p_uri, p_title, p_gallery, p_state FROM ' . SJONSITE_PDO_PREFIX . 'pages ORDER BY p_uri';
+					$sql = 'SELECT p_id, p_pid, p_uri, p_title, p_gallery, p_state FROM ' . SJONSITE_PDO_PREFIX . 'pages ORDER BY p_uri';
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_PagesModel');
 					$this->pagesList = array();
 					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {
-						$this->pagesList[] = $row;
+						$this->pagesList[$row->p_id] = $row;
 					}
 					$res = null;
+					foreach ($this->pagesList as $pid => $pdata) {
+						$this->pagesList[$pid]->indent = ($pdata->p_pid ? ($this->pagesList[$pdata->p_pid]->p_pid ? ($this->pagesList[$this->pagesList[$pdata->p_pid]->p_pid]->p_pid ? 3 : 2) : 1) : 0);
+					}
 					$this->template('admin-pages');
 				}
 			}
@@ -268,6 +331,13 @@
 				$this->template('system-error');
 			}
 		}
+
+		/**
+		 * Galleryform data object
+		 *
+		 * @var Sjonsite_GalleryModel
+		 */
+		protected $galleryformData;
 
 		/**
 		 * Handle adding galleries
@@ -331,7 +401,22 @@
 		protected function doGalleryList () {
 			try {
 				if ($this->checkAuth(self::authGallery)) {
-					$sql = 'SELECT g_id, g_page, g_title FROM ' . SJONSITE_PDO_PREFIX . 'gallery ORDER BY g_title';
+					$sql = '
+SELECT
+	g_id,
+	p.p_title,
+	g_title,
+	COUNT(i.i_id) AS i_count
+FROM
+	' . SJONSITE_PDO_PREFIX . 'gallery g
+	LEFT JOIN
+	' . SJONSITE_PDO_PREFIX . 'pages p ON p.p_id = g.g_page
+	LEFT JOIN
+	' . SJONSITE_PDO_PREFIX . 'images i ON i.i_parent_id = g.g_id
+WHERE
+	(i.i_parent = ' . $this->db->quote(Sjonsite_Model::GALLERY) . ' OR i.i_parent IS NULL)
+ORDER BY
+	g_title';
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_GalleryModel');
 					$this->galleryList = array();
 					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {
@@ -366,6 +451,24 @@
 					$this->formAction = 'add';
 					$this->formErrors = array();
 					if ($this->ispost()) {
+						$this->doUsersValidate(true);
+						if (count($this->formErrors) == 0) {
+							$sql = 'INSERT INTO ' . SJONSITE_PDO_PREFIX . 'users (u_id, u_name, u_email, u_passwd, u_level, u_state) VALUES (NULL, :name, :email, :passwd, :level, :state)';
+							$res = $this->db->prepare($sql);
+							if ($res->execute(array(
+								':name' => $this->userformData->u_name,
+								':email' => $this->userformData->u_email,
+								':passwd' => $this->userformData->u_passwd,
+								':level' => $this->userformData->u_level,
+								':state' => $this->userformData->u_state,
+							))) {
+								$this->setMessage('User &lsquo;' . $this->out($this->userformData->u_name) . '&rsquo; added');
+								$this->redirect('/admin/users');
+							}
+							else {
+								$this->setMessage('Error adding user &lsquo;' . $this->out($this->userformData->u_name) . '&rsquo;', self::error);
+							}
+						}
 					}
 					$this->template('admin-users-form');
 				}
@@ -391,45 +494,25 @@
 						$this->formAction = 'edit/' . $this->userformData->u_id;
 						$this->formErrors = array();
 						if ($this->ispost()) {
-							$this->userformData->u_name = $this->param('u_name');
-							if (empty($this->userformData->u_name)) {
-								$this->formErrors['u_name'] = true;
-								$this->setMessage('You need to fill in a name!', self::error);
-							}
-							$this->userformData->u_email = $this->param('u_email');
-							if (!$this->isemail($this->userformData->u_email)) {
-								$this->formErrors['u_email'] = true;
-								$this->userformData->u_email = null;
-								$this->setMessage('You need to fill in an email!', self::error);
-							}
-							// check email is unique
-							if ($this->param('u_passwd')) {
-								$passwd = $this->param('u_passwd');
-								$passwd_check = $this->param('u_passwd_check');
-								if (empty($passwd_check) || ($passwd != $passwd_check)) {
-									$this->formErrors['u_email'] = true;
-									$this->setMessage('If you want to change the password, fill it out the same twice!', self::error);
+							$this->doUsersValidate();
+							if (count($this->formErrors) == 0) {
+								$sql = 'UPDATE ' . SJONSITE_PDO_PREFIX . 'users SET u_name = :name, u_email = :email, u_passwd = :passwd, u_level = :level, u_state = :state WHERE u_id = :id';
+								$res = $this->db->prepare($sql);
+								if ($res->execute(array(
+									':id' => $this->userformData->u_id,
+									':name' => $this->userformData->u_name,
+									':email' => $this->userformData->u_email,
+									':passwd' => $this->userformData->u_passwd,
+									':level' => $this->userformData->u_level,
+									':state' => $this->userformData->u_state,
+								))) {
+									$this->setMessage('User &lsquo;' . $this->out($this->userformData->u_name) . '&rsquo; updated');
+									$this->redirect('/admin/users');
 								}
 								else {
-									$this->userformData->u_passwd = sha1($passwd);
+									$this->setMessage('Error updating user &lsquo;' . $this->out($this->userformData->u_name) . '&rsquo;', self::error);
 								}
 							}
-							$u_level = $this->param('u_level');
-							$level = 0;
-							if (is_array($u_level) && count($u_level)) {
-								foreach ($u_level as $value) {
-									$level += $value;
-								}
-							}
-							if ($level == 0) {
-								$this->formErrors['u_level'] = true;
-								$this->setMessage('A user needs at least one level of authorisation!', self::error);
-							}
-							else {
-								$this->userformData->u_level = $level;
-							}
-							$this->userformData->u_state = $this->param('u_state');
-							// update
 						}
 						$this->template('admin-users-form');
 					}
@@ -445,6 +528,65 @@
 		}
 
 		/**
+		 * Validate users input
+		 *
+		 * @param bool $requirePassword
+		 * @return void
+		 */
+		private function doUsersValidate ($requirePassword = false) {
+			$this->userformData->u_name = $this->param('u_name');
+			if (empty($this->userformData->u_name)) {
+				$this->formErrors['u_name'] = true;
+				$this->setMessage('You need to fill in a name!', self::error);
+			}
+			$this->userformData->u_email = $this->param('u_email');
+			if (!$this->isemail($this->userformData->u_email)) {
+				$this->formErrors['u_email'] = true;
+				$this->userformData->u_email = null;
+				$this->setMessage('You need to fill in an email!', self::error);
+			}
+			if ($this->isemail($this->userformData->u_email)) {
+				$sql = 'SELECT COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'users WHERE u_email = ' . $this->db->quote($this->userformData->u_email);
+				if ($this->userformData->u_id > 0) {
+					$sql .= ' AND u_id <> ' . $this->db->quote($this->userformData->u_id);
+				}
+				$res = $this->db->query($sql);
+				if ($res && $res->fetchColumn() > 0) {
+					$this->formErrors['u_email'] = true;
+					$this->setMessage('The email is already in use!', self::error);
+				}
+			}
+			$passwd = $this->param('u_passwd');
+			$passwd_check = $this->param('u_passwd_check');
+			if ($requirePassword && empty($passwd)) {
+				$this->formErrors['u_passwd'] = true;
+				$this->setMessage('You need to fill in a password!', self::error);
+			}
+			if ($passwd && ($passwd != $passwd_check)) {
+				$this->formErrors['u_passwd'] = true;
+				$this->setMessage('You need to fill out the same password twice!', self::error);
+			}
+			if ($passwd && ($passwd == $passwd_check)) {
+				$this->userformData->u_passwd = sha1($passwd);
+			}
+			$u_level = $this->param('u_level');
+			$level = 0;
+			if (is_array($u_level) && count($u_level)) {
+				foreach ($u_level as $value) {
+					$level += $value;
+				}
+			}
+			if ($level == 0) {
+				$this->formErrors['u_level'] = true;
+				$this->setMessage('A user needs at least one level of authorisation!', self::error);
+			}
+			else {
+				$this->userformData->u_level = $level;
+			}
+			$this->userformData->u_state = $this->param('u_state');
+		}
+
+		/**
 		 * Handle removing users
 		 *
 		 * @return void
@@ -452,8 +594,37 @@
 		protected function doUsersRemove () {
 			try {
 				if ($this->checkAuth(self::authUsers)) {
-
-					$this->template('admin-message');
+					$this->userformData = new Sjonsite_UsersModel();
+					$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'users WHERE u_id = ' . $this->db->quote($this->pathPart(4));
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
+					if ($res && $this->userformData = $res->fetch(PDO::FETCH_CLASS)) {
+						if ($this->ispost()) {
+							if ($this->param('sure', false) == true) {
+								$sql = 'DELETE FROM ' . SJONSITE_PDO_PREFIX . 'users WHERE u_id = ' . $this->db->quote($this->userformData->u_id);
+								$res = $this->db->query($sql);
+								if ($res && $res->rowCount() == 1) {
+									$this->setMessage('User removed', self::info);
+								}
+								else {
+									$this->setMessage('Error removing user', self::error);
+								}
+							}
+							else {
+								$this->setMessage('Skipped removing user', self::info);
+							}
+							$this->redirect('/admin/users');
+						}
+						$this->formType = 'remove';
+						$this->formAction = '/admin/users/remove/' . $this->userformData->u_id;
+						$this->formData = array(
+							'title' => 'Remove user',
+							'question' => 'Are you sure you want to remove user &lsquo;' . $this->out($this->userformData->u_name) . '&rsquo;?'
+						);
+						$this->template('admin-message');
+					}
+					else {
+						throw new Exception('Unknown user selected');
+					}
 				}
 			}
 			catch (Exception $e) {
@@ -470,7 +641,7 @@
 		protected function doUsersList () {
 			try {
 				if ($this->checkAuth(self::authUsers)) {
-					$sql = 'SELECT u_id, u_name, u_email, u_level, u_state FROM ' . SJONSITE_PDO_PREFIX . 'users ORDER BY u_name';
+					$sql = 'SELECT u_id, u_name, u_email, u_level, u_state FROM ' . SJONSITE_PDO_PREFIX . 'users ORDER BY u_id';
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_UsersModel');
 					$this->usersList = array();
 					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {

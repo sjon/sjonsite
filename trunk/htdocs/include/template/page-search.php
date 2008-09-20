@@ -11,7 +11,7 @@
 	 */
 
 	$this->template('include/header');
-	if ($this->searchQuery) {
+	if ($this->searchQuery !== null) {
 		if (count($this->searchResults)) {
 ?>
 			<div id="main">
@@ -76,6 +76,7 @@
 				<p>Lorum ipsum dolor sit amet</p>
 <?php
 	}
+	/*
 ?>
 				<div class="form">
 					<form action="/search" method="get">
@@ -95,6 +96,7 @@
 						</div>
 					</form>
 				</div>
+<?php */ ?>
 			</div>
 <?php
 	$this->template('include/footer');

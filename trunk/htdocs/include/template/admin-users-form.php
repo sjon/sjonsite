@@ -45,7 +45,7 @@
 								</div>
 							</div>
 							<div class="label<?php if (array_key_exists('u_level', $this->formErrors)) echo ' error'; ?>">
-								<label for="user-level">Authorisation level:</label>
+								<label>Authorisation level:</label>
 								<div class="field">
 									<label><input type="checkbox" name="u_level[]" value="1<?php if (($this->userformData->u_level & 1) == 1) echo '" checked="checked'; ?>" /> pages</label>
 									<label><input type="checkbox" name="u_level[]" value="2<?php if (($this->userformData->u_level & 2) == 2) echo '" checked="checked'; ?>" /> gallery</label>

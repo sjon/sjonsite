@@ -14,7 +14,10 @@
 ?>
 			<div id="main">
 				<h1>Content Page</h1>
-				<p>Lorum ipsum dolor sit amet</p>
+				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
+				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
+				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
+				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
 			</div>
 <?php
 	$this->template('include/footer');
