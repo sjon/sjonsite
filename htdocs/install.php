@@ -38,6 +38,7 @@
 			$this->settings->insert($this->db, 'contactTo', 'info@example.org');
 			$this->settings->insert($this->db, 'contactFrom', 'noreply@example.org');
 			$this->settings->insert($this->db, 'contactSubject', 'Contact Form E-mail');
+			$this->settings->insert($this->db, 'searchEnabled', true);
 			$this->settings->insert($this->db, 'searchPerPage', 10);
 		}
 

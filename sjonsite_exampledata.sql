@@ -28,3 +28,4 @@ INSERT INTO sjonsite_pages (p_id, p_pid, p_uri, p_title, p_sorting, p_state) VAL
 
 INSERT INTO sjonsite_gallery (g_id, g_page, g_title, g_summary) VALUES (1, 7, 'Foobar Product Gallery', NULL);
 
+INSERT INTO sjonsite_users (u_id, u_name, u_email, u_passwd, u_level, u_state) VALUES (1, 'Administrator', 'info@example.com', SHA1('example'), 15, 'A');

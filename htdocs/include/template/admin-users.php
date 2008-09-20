@@ -11,7 +11,6 @@
 	 */
 
 	$this->template('include/header');
-	// u_id, u_name, u_email, u_level, u_state
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
@@ -36,22 +35,81 @@
 						<tbody>
 <?php
 	if (count($this->usersList) > 0) {
+		$even = false;
 		foreach ($this->usersList as $user) {
 ?>
-							<tr>
+							<tr class="<?php echo $even ? 'even' : 'odd'; $even = !$even; ?>">
 								<td><?php echo $this->out($user->u_name); ?></td>
 								<td><?php echo $this->out($user->u_email); ?></td>
-								<td>
-									<img src="/img/admin/user-level-1.png" alt="Can manage pages" />
-									<img src="/img/admin/user-level-2.png" alt="Can manage gallery" />
-									<img src="/img/admin/user-level-4.png" alt="Can manage users" />
-									<img src="/img/admin/user-level-8.png" alt="Can manage settings" />
+								<td class="center">
+<?php
+			if (($user->u_level & 1) == 1) {
+?>
+									<img src="/img/admin/user-level-1.png" title="Can manage pages" alt="Can manage pages" />
+<?php
+			}
+			else {
+?>
+									<img src="/img/admin/user-level-0.png" alt="" />
+<?php
+			}
+			if (($user->u_level & 2) == 2) {
+?>
+									<img src="/img/admin/user-level-2.png" title="Can manage gallery" alt="Can manage gallery" />
+<?php
+			}
+			else {
+?>
+									<img src="/img/admin/user-level-0.png" alt="" />
+<?php
+			}
+			if (($user->u_level & 4) == 4) {
+?>
+									<img src="/img/admin/user-level-4.png" title="Can manage users" alt="Can manage users" />
+<?php
+			}
+			else {
+?>
+									<img src="/img/admin/user-level-0.png" alt="" />
+<?php
+			}
+			if (($user->u_level & 8) == 8) {
+?>
+									<img src="/img/admin/user-level-8.png" title="Can manage settings" alt="Can manage settings" />
+<?php
+			}
+			else {
+?>
+									<img src="/img/admin/user-level-0.png" alt="" />
+<?php
+			}
+?>
 								</td>
-								<td>
-									<img src="/img/admin/user-state-a.png" alt="This user is active" />
-									<img src="/img/admin/user-state-s.png" alt="This user is suspended" />
-									<img src="/img/admin/user-state-r.png" alt="This user is removed" />
-									<img src="/img/admin/user-state-u.png" alt="Unknown state for this user" />
+								<td class="center">
+<?php
+			switch ($user->u_state) {
+				case Sjonsite_Model::ACTIVE:
+?>
+									<img src="/img/admin/system-state-a.png" title="This user is active" alt="This user is active" />
+<?php
+					break;
+				case Sjonsite_Model::SUSPENDED:
+?>
+									<img src="/img/admin/system-state-s.png" title="This user is suspended" alt="This user is suspended" />
+<?php
+					break;
+				case Sjonsite_Model::REMOVED:
+?>
+									<img src="/img/admin/system-state-r.png" title="This user is removed" alt="This user is removed" />
+<?php
+					break;
+				default:
+?>
+									<img src="/img/admin/system-state-u.png" title="Unknown state for this user" alt="Unknown state for this user" />
+<?php
+					break;
+			}
+?>
 								</td>
 								<td>
 									<a href="/admin/users/edit/<?php echo $this->out($user->u_id); ?>" title="Edit user &lsquo;<?php echo $this->out($user->u_name); ?>&rsquo;"><img src="/img/admin/user-edit.png" alt="edit" /></a>

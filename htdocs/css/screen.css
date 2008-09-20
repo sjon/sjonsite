@@ -8,3 +8,64 @@
  * @version $Id$
  */
 
+body {
+	font-family : Verdana, serif;
+	font-size: 1em;
+}
+
+img {
+	border : none;
+}
+
+#container {
+	border: 0px solid black;
+	width: 900px;
+	margin: 0 auto 0 auto;
+	padding: 0;
+}
+
+#main {
+	margin: 0;
+	padding: 0;
+	border: 0px solid black;
+	position: relative;
+	top: 25px;
+	left: 10px;
+	width: 640px;
+	float: left;
+	clear: left;
+}
+
+#menu {
+	margin: 0;
+	padding: 0;
+	border: 0px solid black;
+	position: relative;
+	top: 25px;
+	width: 240px;
+	float: right;
+	clear: right;
+}
+
+#menu ul {
+	margin: 0;
+	padding: 0;
+	padding-left: 10px;
+}
+
+#menu li {
+	list-style: none;
+}
+
+#system-stats {
+	position: relative;
+	margin-top: 25px;
+	margin-right: 10px;
+	width: 900px;
+	font-size: 0.6em;
+	text-align: right;
+}
+
+.clear {
+	clear: both;
+}

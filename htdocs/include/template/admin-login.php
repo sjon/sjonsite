@@ -14,6 +14,14 @@
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
+<?php
+	if ($_SESSION['adminFlag']) {
+?>
+				<p>You don't have enough privileges to view this page.</p>
+<?php
+	}
+	else {
+?>
 				<p>Lorum ipsum</p>
 				<div class="form">
 					<form action="/admin" method="post">
@@ -29,7 +37,7 @@
 							<div class="label">
 								<label for="auth-passwd">Password:</label>
 								<div class="field">
-									<input type="text" id="auth-passwd" name="authPasswd" value="" size="20" />
+									<input type="password" id="auth-passwd" name="authPasswd" value="" size="20" />
 								</div>
 							</div>
 						</fieldset>
@@ -40,6 +48,9 @@
 						</div>
 					</form>
 				</div>
+<?php
+	}
+?>
 			</div>
 <?php
 	$this->template('include/footer');
