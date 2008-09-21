@@ -26,6 +26,7 @@
 							<legend>Add a page</legend>
 							<input type="hidden" name="p_id" value="null" />
 							<input type="hidden" name="p_pid" value="<?php echo $this->out($this->pageformData->p_pid); ?>" />
+							<input type="hidden" name="p_sorting" value="<?php echo $this->out($this->pageformData->p_sorting); ?>" />
 							<div class="label">
 								<label>What do you want to add?</label>
 								<div class="field">
@@ -64,7 +65,7 @@
 							<div class="label">
 								<label for="page-state">State:</label>
 								<div class="field">
-									<select id="page-state" name="u_state" size="1">
+									<select id="page-state" name="p_state" size="1">
 										<option value="A<?php echo ($this->pageformData->p_state == Sjonsite_Model::ACTIVE ? '" selected="selected' : null); ?>"> active </option>
 										<option value="S<?php echo ($this->pageformData->p_state == Sjonsite_Model::SUSPENDED ? '" selected="selected' : null); ?>"> suspended </option>
 										<option value="R<?php echo ($this->pageformData->p_state == Sjonsite_Model::REMOVED ? '" selected="selected' : null); ?>"> removed </option>
@@ -87,7 +88,7 @@
 							<div class="label">
 								<label for="page-summary2">Summary:</label>
 								<div class="field">
-									<textarea id="page-summary2" name="p_summary" rows="10" cols="80" class="wymeditor-small" title=""><?php echo $this->out($this->pageformData->p_summary); ?></textarea>
+									<textarea id="page-summary2" name="p_summary" rows="10" cols="80" class="wymeditor small" title=""><?php echo $this->out($this->pageformData->p_summary); ?></textarea>
 								</div>
 							</div>
 							<input type="hidden" name="p_content" value="null" />
@@ -108,7 +109,7 @@
 							<div class="label">
 								<label for="page-summary">Summary:</label>
 								<div class="field">
-									<textarea id="page-summary" name="p_summary" rows="10" cols="80" class="wymeditor-small" title=""><?php echo $this->out($this->pageformData->p_summary); ?></textarea>
+									<textarea id="page-summary" name="p_summary" rows="10" cols="80" class="wymeditor small" title=""><?php echo $this->out($this->pageformData->p_summary); ?></textarea>
 								</div>
 							</div>
 							<div class="label">

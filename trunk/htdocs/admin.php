@@ -174,7 +174,7 @@
 					throw new Exception($e->getMessage(), $e->getCode());
 				}
 			}
-			if ($_SESSION['adminData']->u_id > 0) {
+			if ($_SESSION['adminData']->u_id > 0 && $_SESSION['adminData']->u_state == Sjonsite_Model::ACTIVE) {
 				if (($_SESSION['adminData']->u_level & $requiredLevel) == $requiredLevel) {
 					return true;
 				}
@@ -272,6 +272,28 @@
 						$this->formAction = 'edit/' . $this->pageformData->p_id;
 						$this->formErrors = array();
 						if ($this->ispost()) {
+							$this->doPagesValidate();
+							if (count($this->formErrors) == 0) {
+								$sql = 'UPDATE ' . SJONSITE_PDO_PREFIX . 'pages SET p_pid = :pid, p_uri = :uri, p_title = :title, p_summary = :summary, p_content = :content, p_gallery = :gallery, p_sorting = :sorting, p_state = :state WHERE p_id = :id';
+								$res = $this->db->prepare($sql);
+								if ($res->execute(array(
+									':id' => $this->pageformData->p_id,
+									':pid' => $this->pageformData->p_pid,
+									':uri' => $this->pageformData->p_uri,
+									':title' => $this->pageformData->p_title,
+									':summary' => $this->pageformData->p_summary,
+									':content' => $this->pageformData->p_content,
+									':gallery' => $this->pageformData->p_gallery,
+									':sorting' => $this->pageformData->p_sorting,
+									':state' => $this->pageformData->p_state,
+								))) {
+									$this->setMessage('Page &lsquo;' . $this->out($this->pageformData->p_title) . '&rsquo; updated');
+									$this->redirect('/admin/pages');
+								}
+								else {
+									$this->setMessage('Error updating page &lsquo;' . $this->out($this->pageformData->p_title) . '&rsquo;', self::error);
+								}
+							}
 						}
 						$this->template('admin-pages-form');
 					}
@@ -284,6 +306,24 @@
 				$this->ex = $e;
 				$this->template('system-error');
 			}
+		}
+
+		/**
+		 * Validate pages input
+		 *
+		 * @return void
+		 */
+		private function doPagesValidate () {
+			//var_dump($_POST);exit;
+			$this->pageformData->p_pid = $this->param('p_pid');
+			$this->pageformData->p_uri = $this->param('p_uri');
+			$this->pageformData->p_title = $this->param('p_title');
+			$this->pageformData->p_summary = $this->param('p_summary');
+			$this->pageformData->p_content = $this->param('p_content');
+			$this->pageformData->p_gallery = $this->param('p_gallery');
+			//$this->pageformData->p_sorting = $this->param('p_sorting');
+			$this->pageformData->p_state = $this->param('p_state');
+
 		}
 
 		/**
@@ -402,6 +442,13 @@
 				$this->template('system-error');
 			}
 		}
+
+		/**
+		 * Validate gallery input
+		 *
+		 * @return void
+		 */
+		private function doGalleryValidate () {}
 
 		/**
 		 * Handle removing galleries
@@ -703,7 +750,7 @@
 		protected function doLogout () {
 			$_SESSION['adminFlag'] = false;
 			$_SESSION['adminData'] = null;
-			$this->redirect('/');
+			$this->redirect('/admin');
 		}
 
 		/**
@@ -713,7 +760,7 @@
 		 */
 		protected function doAdmin () {
 			try {
-				if ($this->checkAuth((self::authPages | self::authGallery | self::authUsers), false)) {
+				if ($this->checkAuth((self::authPages | self::authGallery | self::authUsers | self::authSettings), false)) {
 					$sql = 'SELECT p_state, COUNT(*) AS total FROM ' . SJONSITE_PDO_PREFIX . 'pages GROUP BY p_state';
 					$res = $this->db->query($sql);
 					$this->pagesCount = $res->fetch(PDO::FETCH_ASSOC);
