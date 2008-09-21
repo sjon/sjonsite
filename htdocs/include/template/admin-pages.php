@@ -12,19 +12,11 @@
 
 	$this->template('include/header');
 ?>
-<!--
-	p_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	p_pid MEDIUMINT UNSIGNED NULL,
-	p_uri VARCHAR (255) NOT NULL,
-	p_title VARCHAR (255) NOT NULL,
-	p_summary TEXT NULL,
-	p_content MEDIUMTEXT NULL,
-	p_gallery MEDIUMINT UNSIGNED NULL,
-	p_sorting SMALLINT UNSIGNED NOT NULL,
-	p_state ENUM ('A', 'S', 'R', 'U') NOT NULL DEFAULT 'U', -->
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
-				<p>Lorum ipsum</p>
+<?php
+	$this->template('include/messages');
+?>
 				<div class="list">
 					<table summary="List of pages">
 						<thead>
@@ -33,12 +25,13 @@
 								<th>Type</th>
 								<th>State</th>
 								<th>Sort</th>
+								<th title="Number of attached images">#</th>
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
 						<tfoot>
 							<tr>
-								<td colspan="4">&nbsp;</td>
+								<td colspan="5">&nbsp;</td>
 								<td><a href="/admin/pages/add" title="Add a new page"><img src="/img/admin/page-add.png" alt="add" /></a></td>
 							</tr>
 						</tfoot>
@@ -94,6 +87,7 @@
 									<a href="/admin/pages/sort/<?php echo $this->out($page->p_id); ?>/up" title="Move page &lsquo;<?php echo $this->out($page->p_title); ?>&rsquo; up"><img src="/img/admin/page-sort-up.png" alt="up" /></a>
 									<a href="/admin/pages/sort/<?php echo $this->out($page->p_id); ?>/down" title="Move page &lsquo;<?php echo $this->out($page->p_title); ?>&rsquo; down"><img src="/img/admin/page-sort-down.png" alt="down" /></a>
 								</td>
+								<td class="center"><?php echo $this->out($page->i_count); ?></td>
 								<td>
 									<a href="/admin/pages/edit/<?php echo $this->out($page->p_id); ?>" title="Edit page &lsquo;<?php echo $this->out($page->p_title); ?>&rsquo;"><img src="/img/admin/page-edit.png" alt="edit" /></a>
 									<a href="/admin/pages/remove/<?php echo $this->out($page->p_id); ?>" title="Remove page &lsquo;<?php echo $this->out($page->p_title); ?>&rsquo;"><img src="/img/admin/page-remove.png" alt="remove" /></a>
@@ -102,11 +96,19 @@
 <?php
 			if ($page->p_gallery > 0) {
 ?>
+									<!--img src="/img/admin/not-available.png" alt="" /-->
 									<a href="/admin/gallery/add/<?php echo $this->out($page->p_gallery); ?>" title="Add images to this gallery"><img src="/img/admin/gallery-add.png" alt="add" /></a>
 <?php
 			}
+			else {
 ?>
-									<a href="<?php echo $this->out($page->p_uri); ?>" class="preview" title="View this page">V</a>
+									<!--a href="/admin/images/add/<?php echo $this->out($page->p_id); ?>" title="Add images to this page"><img src="/img/admin/gallery-add.png" alt="add" /></a-->
+									<img src="/img/admin/not-available.png" alt="" />
+<?php
+			}
+?>
+									&nbsp;
+									<a href="<?php echo $this->out($page->p_uri); ?>" class="preview" title="View this page"><img src="/img/admin/page-preview.png" alt="view" /></a>
 								</td>
 							</tr>
 <?php
@@ -115,7 +117,7 @@
 	else {
 ?>
 							<tr>
-								<td colspan="5">No pages found</td>
+								<td colspan="6">No pages found</td>
 							</tr>
 <?php
 	}

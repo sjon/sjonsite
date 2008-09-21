@@ -14,6 +14,9 @@
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
+<?php
+	$this->template('include/messages');
+?>
 				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
 			</div>
 <?php

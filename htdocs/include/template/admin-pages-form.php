@@ -12,19 +12,11 @@
 
 	$this->template('include/header');
 ?>
-<!--
-	p_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	p_pid MEDIUMINT UNSIGNED NULL,
-	p_uri VARCHAR (255) NOT NULL,
-	p_title VARCHAR (255) NOT NULL,
-	p_summary TEXT NULL,
-	p_content MEDIUMTEXT NULL,
-	p_gallery MEDIUMINT UNSIGNED NULL,
-	p_sorting SMALLINT UNSIGNED NOT NULL,
-	p_state ENUM ('A', 'S', 'R', 'U') NOT NULL DEFAULT 'U', -->
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
-				<p>Lorum ipsum dolor sit amet</p>
+<?php
+	$this->template('include/messages');
+?>
 				<div class="form">
 <?php
 	if (empty($this->pageformData->p_id)) {

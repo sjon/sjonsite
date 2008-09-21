@@ -150,7 +150,6 @@
 		 * @return bool
 		 */
 		protected function checkAuth ($requiredLevel = 7, $strict = true) {
-			$this->requiredLevel = $requiredLevel;
 			if (empty($_SESSION['adminData'])) {
 				$_SESSION['adminFlag'] = false;
 				$_SESSION['adminData'] = new Sjonsite_UsersModel();
@@ -295,8 +294,37 @@
 		protected function doPagesRemove () {
 			try {
 				if ($this->checkAuth(self::authPages)) {
-
-					$this->template('admin-message');
+					$this->pagesformData = new Sjonsite_PagesModel();
+					$sql = 'SELECT * FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE p_id = ' . $this->db->quote($this->pathPart(4));
+					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_PagesModel');
+					if ($res && $this->pagesformData = $res->fetch(PDO::FETCH_CLASS)) {
+						if ($this->ispost()) {
+							if ($this->param('sure', false) == true) {
+								$sql = 'DELETE FROM ' . SJONSITE_PDO_PREFIX . 'pages WHERE p_id = ' . $this->db->quote($this->userformData->u_id);
+								$res = $this->db->query($sql);
+								if ($res && $res->rowCount() == 1) {
+									$this->setMessage('Page removed', self::info);
+								}
+								else {
+									$this->setMessage('Error removing page', self::error);
+								}
+							}
+							else {
+								$this->setMessage('Skipped removing page', self::info);
+							}
+							$this->redirect('/admin/pages');
+						}
+						$this->formType = 'remove';
+						$this->formAction = '/admin/pages/remove/' . $this->pagesformData->p_id;
+						$this->formData = array(
+							'title' => 'Remove page',
+							'question' => 'Are you sure you want to remove page &lsquo;' . $this->out($this->pagesformData->p_title) . '&rsquo;?'
+						);
+						$this->template('admin-message');
+					}
+					else {
+						throw new Exception('Unknown user selected');
+					}
 				}
 			}
 			catch (Exception $e) {
@@ -313,7 +341,7 @@
 		protected function doPagesList () {
 			try {
 				if ($this->checkAuth(self::authPages)) {
-					$sql = 'SELECT p_id, p_pid, p_uri, p_title, p_gallery, p_state FROM ' . SJONSITE_PDO_PREFIX . 'pages ORDER BY p_uri';
+					$sql = 'SELECT p_id, p_pid, p_uri, p_title, p_gallery, p_state, COUNT(i.i_id) AS i_count FROM ' . SJONSITE_PDO_PREFIX . 'pages p LEFT JOIN ' . SJONSITE_PDO_PREFIX . 'images i ON i.i_parent_id = p.p_id WHERE (i.i_parent = ' . $this->db->quote(Sjonsite_Model::GALLERY) . ' OR i.i_parent IS NULL) GROUP BY p.p_id ORDER BY p_uri';
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_PagesModel');
 					$this->pagesList = array();
 					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {
@@ -401,22 +429,7 @@
 		protected function doGalleryList () {
 			try {
 				if ($this->checkAuth(self::authGallery)) {
-					$sql = '
-SELECT
-	g_id,
-	p.p_title,
-	g_title,
-	COUNT(i.i_id) AS i_count
-FROM
-	' . SJONSITE_PDO_PREFIX . 'gallery g
-	LEFT JOIN
-	' . SJONSITE_PDO_PREFIX . 'pages p ON p.p_id = g.g_page
-	LEFT JOIN
-	' . SJONSITE_PDO_PREFIX . 'images i ON i.i_parent_id = g.g_id
-WHERE
-	(i.i_parent = ' . $this->db->quote(Sjonsite_Model::GALLERY) . ' OR i.i_parent IS NULL)
-ORDER BY
-	g_title';
+					$sql = 'SELECT g_id, p.p_title, g_title, COUNT(i.i_id) AS i_count FROM ' . SJONSITE_PDO_PREFIX . 'gallery g LEFT JOIN ' . SJONSITE_PDO_PREFIX . 'pages p ON p.p_id = g.g_page LEFT JOIN ' . SJONSITE_PDO_PREFIX . 'images i ON i.i_parent_id = g.g_id WHERE (i.i_parent = ' . $this->db->quote(Sjonsite_Model::GALLERY) . ' OR i.i_parent IS NULL) GROUP BY g.g_id ORDER BY g_title';
 					$res = $this->db->query($sql, PDO::FETCH_CLASS, 'Sjonsite_GalleryModel');
 					$this->galleryList = array();
 					while ($res && $row = $res->fetch(PDO::FETCH_CLASS)) {

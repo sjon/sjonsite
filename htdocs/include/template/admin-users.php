@@ -14,7 +14,9 @@
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
-				<p>Lorum ipsum</p>
+<?php
+	$this->template('include/messages');
+?>
 				<div class="list">
 					<table summary="List of users">
 						<thead>
@@ -50,7 +52,7 @@
 			}
 			else {
 ?>
-									<img src="/img/admin/user-level-0.png" alt="" />
+									<img src="/img/admin/not-available.png" alt="" />
 <?php
 			}
 			if (($user->u_level & 2) == 2) {
@@ -60,7 +62,7 @@
 			}
 			else {
 ?>
-									<img src="/img/admin/user-level-0.png" alt="" />
+									<img src="/img/admin/not-available.png" alt="" />
 <?php
 			}
 			if (($user->u_level & 4) == 4) {
@@ -70,7 +72,7 @@
 			}
 			else {
 ?>
-									<img src="/img/admin/user-level-0.png" alt="" />
+									<img src="/img/admin/not-available.png" alt="" />
 <?php
 			}
 			if (($user->u_level & 8) == 8) {
@@ -80,7 +82,7 @@
 			}
 			else {
 ?>
-									<img src="/img/admin/user-level-0.png" alt="" />
+									<img src="/img/admin/not-available.png" alt="" />
 <?php
 			}
 ?>
