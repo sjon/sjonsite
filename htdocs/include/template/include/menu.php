@@ -149,10 +149,28 @@
 			<div id="admin-menu">
 				<ul>
 					<li><a href="/admin"><img src="/img/admin/home.png" alt="Home" /> Home</a></li>
+<?php
+		if ($_SESSION['adminData']->u_level & Sjonsite_Admin::authPages) {
+?>
 					<li><a href="/admin/pages"><img src="/img/admin/pages.png" alt="Pages" /> Pages</a></li>
+<?php
+		}
+		if ($_SESSION['adminData']->u_level & Sjonsite_Admin::authGallery) {
+?>
 					<li><a href="/admin/gallery"><img src="/img/admin/gallery.png" alt="Gallery" /> Gallery</a></li>
+<?php
+		}
+		if ($_SESSION['adminData']->u_level & Sjonsite_Admin::authUsers) {
+?>
 					<li><a href="/admin/users"><img src="/img/admin/users.png" alt="Users" /> Users</a></li>
+<?php
+		}
+		if ($_SESSION['adminData']->u_level & Sjonsite_Admin::authSettings) {
+?>
 					<li><a href="/admin/settings"><img src="/img/admin/settings.png" alt="Settings" /> Settings</a></li>
+<?php
+		}
+?>
 					<li><a href="/admin/logout"><img src="/img/admin/logout.png" alt="Logout" /> Logout</a></li>
 				</ul>
 			</div>
