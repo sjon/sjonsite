@@ -14,14 +14,16 @@
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
-				<p>Lorum ipsum</p>
+<?php
+	$this->template('include/messages');
+?>
 				<div class="list">
 					<table summary="List of gallery pages">
 						<thead>
 							<tr>
 								<th>Title</th>
 								<th>Page title</th>
-								<th># Images</th>
+								<th title="Number of attached images">#</th>
 								<th>&nbsp;</th>
 							</tr>
 						</thead>
@@ -39,7 +41,7 @@
 							<tr class="<?php echo $even ? 'even' : 'odd'; $even = !$even; ?>">
 								<td><?php echo $this->out($gallery->g_title); ?></td>
 								<td><?php echo $this->out($gallery->p_title); ?></td>
-								<td><?php echo $this->out($gallery->i_count); ?></td>
+								<td class="center"><?php echo $this->out($gallery->i_count); ?></td>
 								<td>
 									<a href="/admin/gallery/edit/<?php echo $this->out($gallery->g_id); ?>" title="Edit gallery &lsquo;<?php echo $this->out($gallery->g_title); ?>&rsquo;"><img src="/img/admin/gallery-edit.png" alt="edit" /></a>
 									<a href="/admin/gallery/remove/<?php echo $this->out($gallery->g_id); ?>" title="Remove gallery &lsquo;<?php echo $this->out($gallery->g_title); ?>&rsquo;"><img src="/img/admin/gallery-remove.png" alt="remove" /></a>

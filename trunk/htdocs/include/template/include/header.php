@@ -47,20 +47,3 @@
 	</head>
 	<body>
 		<div id="container">
-<?php
-	if ($this->hasMessage()) {
-?>
-			<div id="messages">
-				<ul>
-<?php
-		while ($msg = $this->getMessage()) {
-?>
-					<li class="<?php echo $msg[1]; ?>"><?php echo $this->out($msg[0], true); ?></li>
-<?php
-		}
-?>
-				</ul>
-			</div>
-<?php
-	}
-?>

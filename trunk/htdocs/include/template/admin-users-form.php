@@ -14,7 +14,9 @@
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
-				<p>Lorum ipsum</p>
+<?php
+	$this->template('include/messages');
+?>
 				<div class="form">
 					<form action="/admin/users/<?php echo $this->formAction; ?>" method="post">
 						<fieldset>

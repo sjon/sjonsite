@@ -15,6 +15,7 @@
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
 <?php
+	$this->template('include/messages');
 	if ($_SESSION['adminFlag']) {
 ?>
 				<p>You don't have enough privileges to view this page.</p>
@@ -22,7 +23,6 @@
 	}
 	else {
 ?>
-				<p>Lorum ipsum</p>
 				<div class="form">
 					<form action="/admin" method="post">
 						<fieldset>
