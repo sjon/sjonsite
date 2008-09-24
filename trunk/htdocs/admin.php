@@ -60,6 +60,9 @@
 						case 'remove':
 							$this->doPagesRemove();
 							break;
+						case 'images':
+							$this->doPagesImages();
+							break;
 						default:
 							$this->doPagesList();
 							break;
@@ -371,6 +374,14 @@
 				$this->ex = $e;
 				$this->template('system-error');
 			}
+		}
+
+		/**
+		 * Handle images for a page
+		 *
+		 * @return void
+		 */
+		protected function doPagesImages () {
 		}
 
 		/**
