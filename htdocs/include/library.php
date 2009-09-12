@@ -72,9 +72,6 @@
 			if (!array_key_exists('messages', $_SESSION)) {
 				$_SESSION['messages'] = array();
 			}
-			if (!ini_get('zlib.output_compression')) {
-				//ob_start('ob_gzhandler');
-			}
 			try {
 				$this->settings = new Sjonsite_Settings($this->db);
 			}
@@ -234,37 +231,23 @@
 		}
 
 		/**
-		 * Return the value of a parameter
+		 * Return the value of a parameter from POST or GET, or default value
+		 * If filter is set, will use filter_var()
 		 *
 		 * @param string $name
 		 * @param mixed $default
+		 * @param mixed $filter
+		 * @param mixed $options
 		 * @return mixed
 		 */
-		public function param ($name, $default = null) {
-			$rv = (array_key_exists($name, $_POST) ? $_POST[$name] : (array_key_exists($name, $_GET) ? $_GET[$name] : $default));
-			Sjonsite_Base::param__clean($rv);
-			return ($rv === 'null' ? null : ($rv === 'true' ? true : ($rv === 'false' ? false : $rv)));
-		}
-
-		/**
-		 * Clean up the input
-		 *
-		 * @todo check out the filter extension
-		 * @param mixed $rv
-		 * @return void
-		 */
-		private static function param__clean (&$rv) {
-			if (is_array($rv)) {
-				foreach ($rv as $idx => $val) {
-					Sjonsite_Base::param__clean($rv[$idx]);
+		public function param ($name, $default = null, $filter = null, $options = null) {
+			$rv = (filter_has_var(INPUT_POST, $name) ? $_POST[$name] : (filter_has_var(INPUT_GET, $name) ? $_GET[$name] : $default));
+			if ($filter) {
+				if (($rv = filter_var($rv, $filter, $options)) === false) {
+					$rv = $default;
 				}
 			}
-			elseif (is_string($rv)) {
-				if (get_magic_quotes_gpc()) {
-					$rv = stripslashes($rv);
-				}
-				$rv = trim($rv);
-			}
+			return $rv;
 		}
 
 		/**

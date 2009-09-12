@@ -73,3 +73,24 @@ CREATE TABLE sjonsite_settings (
 	s_value BLOB NULL,
 	PRIMARY KEY (s_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+	resources => tree
+		id, pos, type, typeNNid, uri, state
+	types => list (content-type)
+		id, name, title, type((versioned)data/virtual), config (blog=data,admin=virtual)
+	users => list
+		id, name, email, pwd, etc
+	groups => list
+		id, name, desc
+	usergrouping => join 1=1
+		uid, gid
+	typegrouping => join n=1 (one type can has multiple groups, binding to a group gives that group access to that type)
+		tid, gid, actions
+	typeusers => join n=1 (one type can has multiple users, overrides groups)
+		tid, uid, actions
+
+	typeNN => list
+		id, title, revid
+	typeNNrevs => list
+		id, typeNNid
