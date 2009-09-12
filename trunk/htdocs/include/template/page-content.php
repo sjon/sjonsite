@@ -13,10 +13,10 @@
 	$this->template('include/header');
 ?>
 			<div id="main">
-				<h1>Content Page</h1>
-				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
-				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
-				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
+				<h1><?php echo $this->pagePage->p_title; ?></h1>
+<?php
+	echo $this->pagePage->p_content;
+?>
 				<p>Lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet lorum ipsum dolor sit amet.</p>
 			</div>
 <?php

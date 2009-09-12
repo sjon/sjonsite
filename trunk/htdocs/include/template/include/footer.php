@@ -14,7 +14,7 @@
 ?>
 			<div class="clear">
 			</div>
-			<p id="system-stats">time: <?php printf('%0.3fs', (microtime(true) - SJONSITE_START)); ?> memory: <?php printf('%d KiB', memory_get_usage() / 1024); ?></p>
+			<p id="system-stats">time: <?php printf('%0.1fms', (microtime(true) - SJONSITE_START) * 1000); ?> memory: <?php printf('%d KiB', memory_get_usage() / 1024); ?></p>
 		</div>
 	</body>
 </html>
