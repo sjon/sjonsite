@@ -7,7 +7,7 @@
 	 * @package Sjonsite
 	 * @copyright Sjon's dotCom 2008
 	 * @license Mozilla Public License 1.1
-	 * @version $Id: admin-message.php 21 2008-09-10 11:46:31Z sjonscom $
+	 * @version $Id$
 	 */
 
 	$this->template('include/header');

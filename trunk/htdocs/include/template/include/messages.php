@@ -7,7 +7,7 @@
 	 * @package Sjonsite_Template
 	 * @copyright Sjon's dotCom 2008
 	 * @license Mozilla Public License 1.1
-	 * @version $Id: header.php 31 2008-09-18 15:17:51Z sjonscom $
+	 * @version $Id$
 	 */
 
 	if ($this->hasMessage()) {

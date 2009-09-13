@@ -7,7 +7,7 @@
 	 * @package Sjonsite
 	 * @copyright Sjon's dotCom 2008
 	 * @license Mozilla Public License 1.1
-	 * @version $Id: index.php 32 2008-09-20 14:51:49Z sjonscom $
+	 * @version $Id$
 	 */
 
 	/**
