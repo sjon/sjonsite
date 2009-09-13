@@ -10,87 +10,67 @@
 --  */
 --
 
+SET FOREIGN_KEY_CHECKS=0;
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT=0;
+START TRANSACTION;
+
 -- CREATE DATABASE sjonsite /*!40100 DEFAULT CHARACTER SET utf8 */;
 
-DROP TABLE IF EXISTS sjonsite_pages;
-CREATE TABLE sjonsite_pages (
-	p_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	p_pid MEDIUMINT UNSIGNED NULL,
-	p_uri VARCHAR (255) NOT NULL,
-	p_title VARCHAR (255) NOT NULL,
-	p_summary TEXT NULL,
-	p_content MEDIUMTEXT NULL,
-	p_gallery MEDIUMINT UNSIGNED NULL,
-	p_sorting SMALLINT UNSIGNED NOT NULL,
-	p_state ENUM ('A', 'S', 'R', 'U') NOT NULL DEFAULT 'U',
-	PRIMARY KEY (p_id),
-	UNIQUE KEY p_uri_idx (p_uri),
-	KEY p_sorting_idx (p_sorting),
-	KEY p_state_idx (p_state)
+DROP TABLE IF EXISTS `sjonsite_resources`;
+CREATE TABLE IF NOT EXISTS `sjonsite_resources` (
+	`id` mediumint(8) unsigned NOT NULL auto_increment,
+	`parent` mediumint(8) unsigned default NULL,
+	`trail` varchar(16) NOT NULL,
+	`type` varchar(128) NOT NULL,
+	`controller` varchar(16) NOT NULL DEFAULT 'resource',
+	`sorting` smallint(5) unsigned NOT NULL,
+	`visible` enum('Y','N') NOT NULL DEFAULT 'Y',
+	`state` enum('A','S','R','U') NOT NULL default 'U',
+	PRIMARY KEY (`id`),
+	KEY `parent_idx` (`parent`),
+	KEY `sorting_idx` (`sorting`),
+	KEY `state_idx` (`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+DROP TABLE IF EXISTS `sjonsite_revisions`;
+CREATE TABLE IF NOT EXISTS `sjonsite_revisions` (
+	`id` int(10) unsigned NOT NULL auto_increment,
+	`resource` mediumint(8) unsigned NOT NULL,
+	`revision` smallint(5) unsigned NOT NULL,
+	`uri` varchar(255) NOT NULL,
+	`short` varchar(64) NOT NULL,
+	`title` varchar(255) NOT NULL,
+	`content` mediumtext,
+	PRIMARY KEY (`id`),
+	KEY `resource_idx` (`resource`),
+	KEY `uri_idx` (`uri`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+DROP TABLE IF EXISTS `sjonsite_settings`;
+CREATE TABLE IF NOT EXISTS `sjonsite_settings` (
+	`name` varchar(128) NOT NULL,
+	`value` blob,
+	PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS sjonsite_gallery;
-CREATE TABLE sjonsite_gallery (
-	g_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	g_page MEDIUMINT UNSIGNED NULL,
-	g_title VARCHAR (255) NOT NULL,
-	g_summary TEXT NULL,
-	PRIMARY KEY (g_id),
-	UNIQUE KEY g_page_idx (g_page),
-	CONSTRAINT g_page_fk FOREIGN KEY (g_page) REFERENCES sjonsite_pages (p_id) ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `sjonsite_users`;
+CREATE TABLE IF NOT EXISTS `sjonsite_users` (
+	`id` smallint(5) unsigned NOT NULL auto_increment,
+	`name` varchar(255) NOT NULL,
+	`email` varchar(255) NOT NULL,
+	`passwd` char(40) NOT NULL,
+	`level` smallint(5) unsigned NOT NULL,
+	`state` enum('A','S','R','U') NOT NULL default 'U',
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `email_idx` (`email`),
+	KEY `state_idx` (`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
-DROP TABLE IF EXISTS sjonsite_images;
-CREATE TABLE sjonsite_images (
-	i_id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	i_parent ENUM ('P', 'G', 'U') NOT NULL DEFAULT 'U',
-	i_parent_id MEDIUMINT UNSIGNED NULL,
-	i_uri VARCHAR (255) NOT NULL,
-	i_title VARCHAR (255) NOT NULL,
-	i_width SMALLINT UNSIGNED NOT NULL,
-	i_height SMALLINT UNSIGNED NOT NULL,
-	PRIMARY KEY (i_id),
-	KEY i_parent_idx (i_parent),
-	KEY i_parent_id_idx (i_parent_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ALTER TABLE `sjonsite_resources` ADD CONSTRAINT `resource_fk` FOREIGN KEY (`parent`) REFERENCES `sjonsite_resources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `sjonsite_revisions` ADD CONSTRAINT `revision_fk` FOREIGN KEY (`resource`) REFERENCES `sjonsite_resources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-DROP TABLE IF EXISTS sjonsite_users;
-CREATE TABLE sjonsite_users (
-	u_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	u_name VARCHAR (255) NOT NULL,
-	u_email VARCHAR (255) NOT NULL,
-	u_passwd CHAR (40) NOT NULL,
-	u_level SMALLINT UNSIGNED NOT NULL,
-	u_state ENUM ('A', 'S', 'R', 'U') NOT NULL DEFAULT 'U',
-	PRIMARY KEY (u_id),
-	UNIQUE KEY u_email_idx (u_email),
-	KEY u_state_idx (u_state)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET FOREIGN_KEY_CHECKS=1;
 
-DROP TABLE IF EXISTS sjonsite_settings;
-CREATE TABLE sjonsite_settings (
-	s_name VARCHAR (128) NOT NULL,
-	s_value BLOB NULL,
-	PRIMARY KEY (s_name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+COMMIT;
 
-
-	resources => tree
-		id, pos, type, typeNNid, uri, state
-	types => list (content-type)
-		id, name, title, type((versioned)data/virtual), config (blog=data,admin=virtual)
-	users => list
-		id, name, email, pwd, etc
-	groups => list
-		id, name, desc
-	usergrouping => join 1=1
-		uid, gid
-	typegrouping => join n=1 (one type can has multiple groups, binding to a group gives that group access to that type)
-		tid, gid, actions
-	typeusers => join n=1 (one type can has multiple users, overrides groups)
-		tid, uid, actions
-
-	typeNN => list
-		id, title, revid
-	typeNNrevs => list
-		id, typeNNid

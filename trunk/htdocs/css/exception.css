@@ -1,0 +1,41 @@
+/**
+ * Sjonsite - Exception Stylesheet
+ *
+ * @author Sjon <sjonscom@gmail.com>
+ * @package Sjonsite
+ * @copyright Sjon's dotCom 2008
+ * @license Mozilla Public License 1.1
+ * @version $Id: print.css 21 2008-09-10 11:46:31Z sjonscom $
+ */
+
+body {
+	background-color : #eee;
+	color : #000;
+	font-family : Georgia, Tahoma, sans-serif;
+	font-size : 1.0em;
+}
+
+h1 {
+	color : #300;
+	font-size : 1.1em;
+	font-weight : normal;
+}
+
+h2 {
+	color : #900;
+	font-size : 1.3em;
+}
+
+li {
+	font-size : 0.8em;
+}
+
+#container {
+	background-color : #fff;
+	border : 2px ridge #06f;
+	width : 70%;
+	margin : 0 auto 0 auto;
+	padding : 1em;
+	padding-left : 2em;
+}
+
