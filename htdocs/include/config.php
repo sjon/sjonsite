@@ -25,34 +25,6 @@
 	define ('SJONSITE_INCLUDE', dirname(__FILE__));
 
 	/**
-	 * PDO connection string
-	 *
-	 * @var string
-	 */
-	define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonsite');
-
-	/**
-	 * PDO connection username
-	 *
-	 * @var string
-	 */
-	define ('SJONSITE_PDO_USER', 'username');
-
-	/**
-	 * PDO connection password
-	 *
-	 * @var string
-	 */
-	define ('SJONSITE_PDO_PASS', 'password');
-
-	/**
-	 * PDO table prefix
-	 *
-	 * @var string
-	 */
-	define ('SJONSITE_PDO_PREFIX', 'sjonsite_');
-
-	/**
 	 * Set our default timezone
 	 */
 	date_default_timezone_set('Europe/Amsterdam');
@@ -62,4 +34,100 @@
 	 */
 	session_name('Sjonsite');
 
-?>
+	/**
+	 * Check for development configuration
+	 */
+	if (file_exists(SJONSITE_INCLUDE . '/config.local.php')) {
+		include SJONSITE_INCLUDE . '/config.local.php';
+	}
+
+	/**
+	 * PDO connection string
+	 *
+	 * @var string
+	 */
+	if (!defined('SJONSITE_PDO_DSN')) {
+		define ('SJONSITE_PDO_DSN', 'mysql:host=localhost;port=3306;dbname=sjonscripts');
+	}
+
+	/**
+	 * PDO connection username
+	 *
+	 * @var string
+	 */
+	if (!defined('SJONSITE_PDO_USER')) {
+		define ('SJONSITE_PDO_USER', 'username');
+	}
+
+	/**
+	 * PDO connection password
+	 *
+	 * @var string
+	 */
+	if (!defined('SJONSITE_PDO_PASS')) {
+		define ('SJONSITE_PDO_PASS', 'password');
+	}
+
+	/**
+	 * PDO table prefix
+	 *
+	 * @var string
+	 */
+	if (!defined('SJONSITE_PDO_PREFIX')) {
+		define ('SJONSITE_PDO_PREFIX', 'sjonsite_');
+	}
+
+	/**
+	 * Debugflag
+	 *
+	 * @var bool
+	 */
+	if (!defined('SJONSITE_DEBUG')) {
+		define ('SJONSITE_DEBUG', false);
+	}
+
+	/**
+	 * Autoload
+	 *
+	 * @param string $className
+	 * @return void
+	 */
+	function __autoload ($className) {
+		if (file_exists(SJONSITE_INCLUDE . '/library/' . $className . '.php')) {
+			require_once SJONSITE_INCLUDE . '/library/' . $className . '.php';
+		}
+		else {
+			$className = substr($className, 9);
+			if (file_exists(SJONSITE_INCLUDE . '/model/' . $className . '.php')) {
+				require_once SJONSITE_INCLUDE . '/model/' . $className . '.php';
+			}
+			else {
+				$className = lcfirst($className);
+				if (file_exists(SJONSITE_INCLUDE . '/controller/' . $className . '.php')) {
+					require_once SJONSITE_INCLUDE . '/controller/' . $className . '.php';
+				}
+			}
+		}
+	}
+
+	if (!function_exists('lcfirst')) {
+
+		/**
+		 * Make a string's first character lowercase
+		 *
+		 * @param string $string
+		 * @return string
+		 */
+		function lcfirst ($string) {
+			$string{0} = strtolower($string{0});
+			return $string;
+		}
+
+	}
+
+	function sjonsite_exception_error_handler ($errno, $errstr, $errfile, $errline) {
+		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+	}
+
+	set_error_handler('sjonsite_exception_error_handler');
+
