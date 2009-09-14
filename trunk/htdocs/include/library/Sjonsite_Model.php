@@ -102,7 +102,7 @@
 					$this->__set($name, (array_key_exists($name, $data) ? $data[$name] : null));
 				}
 			}
-			$this->_modified = array();
+			$this->isModified(false);
 		}
 
 		/**
@@ -124,10 +124,38 @@
 		 * @param string $name
 		 * @param mixed $value
 		 * @return void
-		 * @todo add validation based on struct
 		 */
 		public function __set ($name, $value) {
 			if (array_key_exists($name, $this->_structure)) {
+				if (!is_null($value)) {
+					list($type, $config) = $this->_structure[$name];
+					switch ($type) {
+						case 'int':
+							$value = filter_var($value, FILTER_VALIDATE_INT, array('options' => array('min_range' => $config['min'], 'max_range' => $config['max'])));
+							if ($value === false) {
+								throw new Sjonsite_ModelException('Integer value `' . $name . '` is out of bounds.');
+							}
+							break;
+						case 'string':
+							if ($config['type'] != 'any') {
+								$value = filter_var($value, $config['type'], $config['options']);
+								if ($value === false) {
+									throw new Sjonsite_ModelException('String value `' . $name . '` does not validate.');
+								}
+							}
+							if (strlen($value) > $config['length']) {
+								throw new Sjonsite_ModelException('String value `' . $name . '` is out of bounds.');
+							}
+							break;
+						case 'enum':
+							if (!in_array($value, $config['items'])) {
+								throw new Sjonsite_ModelException('Enum value `' . $name . '` is out of bounds.');
+							}
+							break;
+						default:
+							throw new Sjonsite_ModelException('Invalid type setting in model structure');
+					}
+				}
 				$this->$name = ($value ? $value : (isset($this->_structure[$name][1]['default']) ? $this->_structure[$name][1]['default'] : null));
 				$this->_modified[$name] = true;
 			}
@@ -169,6 +197,25 @@
 				}
 			}
 			return $rv;
+		}
+
+		/**
+		 * Returns true if the model has been modified, false if not.
+		 * Modified state can be set or reset with $state
+		 *
+		 * @param bool $state
+		 * @return bool
+		 */
+		public function isModified ($state = null) {
+			if (!is_null($state)) {
+				$this->_modified = array();
+				if ($state) {
+					foreach (array_keys($this->_structure) as $key) {
+						$this->_modified[$key] = true;
+					}
+				}
+			}
+			return (count($this->_modified) > 0);
 		}
 
 	}

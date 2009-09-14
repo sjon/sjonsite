@@ -140,7 +140,7 @@
 		 * @return bool
 		 */
 		public function isValid () {
-			return (!is_null($this->data) && !$this->isExpired());
+			return (!empty($this->data) && !$this->isExpired());
 		}
 
 		/**

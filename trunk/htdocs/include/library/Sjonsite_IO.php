@@ -132,22 +132,47 @@
 			return $this->requestType;
 		}
 
+		/**
+		 * Returns true if the current request method equals POST
+		 *
+		 * @return bool
+		 */
 		public function isPost () {
 			return ($this->requestMethod == 'post');
 		}
 
+		/**
+		 * Returns true if the current request type equals ATOM
+		 *
+		 * @return bool
+		 */
 		public function isAtom () {
 			return ($this->requestType == 'atom');
 		}
 
+		/**
+		 * Returns true if the current request type equals JSON
+		 *
+		 * @return bool
+		 */
 		public function isJson () {
 			return ($this->requestType == 'json');
 		}
 
+		/**
+		 * Returns true if the current request type equals RSS
+		 *
+		 * @return bool
+		 */
 		public function isRss () {
 			return ($this->requestType == 'rss');
 		}
 
+		/**
+		 * Returns true if the current request type equals XML
+		 *
+		 * @return bool
+		 */
 		public function isXml () {
 			return ($this->requestType == 'xml');
 		}

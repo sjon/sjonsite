@@ -103,7 +103,7 @@
 			Sjonsite::$db = null;
 			session_write_close();
 			header('Content-Type: ' . Sjonsite::$request->getType() . '; charset=utf-8');
-			header('X-Sjonsite: ' . sprintf('%0.2ms %dKiB %d queries %d cachehits', ((microtime(true) - SJONSITE_START) * 1000), (memory_get_usage() / 1024), Sjonsite_PDO::getHits(), Sjonsite_Cache::getHits()));
+			header('X-Sjonsite: ' . sprintf('T %0.2fms M %dKiB Q %d C %d', ((microtime(true) - SJONSITE_START) * 1000), (memory_get_usage() / 1024), Sjonsite_PDO::getHits(), Sjonsite_Cache::getHits()));
 			if (Sjonsite::$request->getRedirect()) {
 				header('Location: ' . Sjonsite::$request->getRedirect());
 			}
@@ -212,7 +212,7 @@
 		 * @return mixed
 		 */
 		public function __get ($name) {
-			return (array_key_exists($name, self::$settings) ? self::$settings[$name] : null);
+			return (array_key_exists($name, $this->settings) ? $this->settings[$name] : null);
 		}
 
 		/**
@@ -222,7 +222,7 @@
 		 * @return bool
 		 */
 		public function __isset ($name) {
-			return array_key_exists($name, self::$settings);
+			return array_key_exists($name, $this->settings);
 		}
 
 	}

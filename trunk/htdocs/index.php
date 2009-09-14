@@ -20,8 +20,8 @@
 	 */
 	try {
 		Sjonsite::init();
-		if (Sjonsite::$auth->isGuest()) {
-			$guestRequest = Sjonsite_Cache::get('guest-request-' . Sjonsite::$io->requestUri, 3600);
+		if (!Sjonsite::$io->isPost() && Sjonsite::$auth->isGuest()) {
+			$guestRequest = Sjonsite_Cache::get('guest-request-' . Sjonsite::$io->requestUri() . '-' . Sjonsite::$io->requestType(), SJONSITE_TTL);
 			if ($guestRequest->isValid()) {
 				Sjonsite::$request = $guestRequest->getData();
 				Sjonsite::shutdown();
@@ -29,7 +29,7 @@
 		}
 		// build response
 		Sjonsite::connect();
-		$sql = 'SELECT resource FROM %prefix%revisions WHERE uri = ' . Sjonsite::$db->quote(Sjonsite::$io->requestUri()) . ' ORDER BY revision DESC LIMIT 0, 1';
+		$sql = 'SELECT resource FROM %prefix%revisions WHERE uri = ' . Sjonsite::$db->quote(Sjonsite::$io->requestUri()) . ' AND state = ' . Sjonsite::$db->quote(Sjonsite_Model::ACTIVE) . ' ORDER BY revision DESC LIMIT 0, 1';
 		$res = Sjonsite::$db->query($sql);
 		$resource = $res->fetchColumn();
 		$res = null;
@@ -41,11 +41,12 @@
 			Sjonsite::$io->throwError(404); // 410 Gone
 		}
 		$revision = new Sjonsite_Revision();
-		$sql = 'SELECT * FROM %prefix%revisions WHERE resource = ' . Sjonsite::$db->quote($resource->id) . ' ORDER BY revision DESC LIMIT 0, 1';
+		$sql = 'SELECT * FROM %prefix%revisions WHERE resource = ' . Sjonsite::$db->quote($resource->id) . ' AND state = ' . Sjonsite::$db->quote(Sjonsite_Model::ACTIVE) . ' ORDER BY revision DESC LIMIT 0, 1';
 		$res = Sjonsite::$db->query($sql);
 		$res->setFetchMode(PDO::FETCH_INTO, $revision);
 		$res->fetch(PDO::FETCH_INTO);
 		$res = null;
+		$revision->isModified(false);
 		if ($revision->resource != $resource->id) {
 			Sjonsite::$io->throwError(404); // 204 No Content
 		}
@@ -56,13 +57,14 @@
 		$controller = 'Sjonsite_' . ucfirst($resource->controller) . 'Controller';
 		$dispatch = new $controller($resource, $revision);
 		$dispatch->processRequest();
-		if (Sjonsite::$auth->isGuest() && $guestRequest instanceof Sjonsite_Cache_Data) {
-			Sjonsite::$request->setContent(ob_get_clean());
+		if (!$dispatch->cacheDisabled() && Sjonsite::$auth->isGuest() && $guestRequest instanceof Sjonsite_Cache_Data) {
 			$guestRequest->setData(Sjonsite::$request);
 			Sjonsite_Cache::set($guestRequest);
 		}
 		Sjonsite::shutdown();
 	} catch (Exception $e) {
+			$search = dirname(SJONSITE_INCLUDE);
+			$replace = '~';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -76,7 +78,7 @@
 	<body>
 		<div id="container">
 			<h1>An Error Occurred</h1>
-			<h2><?php echo $e->getCode() . ': ' . $e->getMessage(); ?></h2>
+			<h2><?php echo str_replace($search, $replace, ($e->getCode() ? $e->getCode() . ': ' : null) . $e->getMessage()); ?></h2>
 <?php
 		if (SJONSITE_DEBUG) {
 ?>
@@ -84,13 +86,15 @@
 			<ol>
 <?php
 			$trace = $e->getTrace();
-			$search = dirname(SJONSITE_INCLUDE);
-			$replace = '~';
 			foreach ($trace as $t) {
-				$func = (isset($t['class']) ? $t['class'] . $t['type'] . $t['function'] : $t['function']);
-				$file = str_replace($search, $replace, $t['file'])
+				$message = null;
+				if (isset($t['class'])) $message .= $t['class'];
+				if (isset($t['type'])) $message .= $t['type'];
+				if (isset($t['function'])) $message .= $t['function'] . '()';
+				if (isset($t['file'])) $message .= ' in file ' . $t['file'];
+				if (isset($t['line'])) $message .= ' line ' . $t['line'];
 ?>
-				<li><?php echo $func; ?>() in file <?php echo $file; ?> line <?php echo $t['line']; ?></li>
+				<li><?php echo str_replace($search, $replace, $message); ?></li>
 <?php
 			}
 ?>

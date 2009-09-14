@@ -53,6 +53,11 @@
 		protected $content;
 
 		/**
+		 * @var constant
+		 */
+		protected $state;
+
+		/**
 		 * @var string
 		 */
 		protected $_tablename = 'revisions';
@@ -68,6 +73,7 @@
 			'short' => array('string', array('type' => 'any', 'length' => 64)),
 			'title' => array('string', array('type' => 'any', 'length' => 255)),
 			'content' => array('string', array('type' => 'any', 'length' => 65536)),
+			'state' => array('enum', array('items' => array('A','S','R','U'), 'default' => 'U'))
 		);
 
 	}

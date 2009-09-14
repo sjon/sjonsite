@@ -19,7 +19,7 @@ img {
 
 #container {
 	border: 0px solid black;
-	width: 900px;
+	width: 980px;
 	margin: 0 auto 0 auto;
 	padding: 0;
 }
@@ -27,11 +27,14 @@ img {
 #main {
 	margin: 0;
 	padding: 0;
-	border: 0px solid black;
+	padding-left : 0.5em;
+	padding-right : 0.5em;
+	background-color : #eef;
+	border: 1px solid black;
 	position: relative;
 	top: 25px;
 	left: 10px;
-	width: 640px;
+	width: 690px;
 	float: left;
 	clear: left;
 }
@@ -39,10 +42,11 @@ img {
 #menu {
 	margin: 0;
 	padding: 0;
+	padding-left : 0.1em;
 	border: 0px solid black;
 	position: relative;
 	top: 25px;
-	width: 240px;
+	width: 250px;
 	float: right;
 	clear: right;
 }
@@ -57,15 +61,34 @@ img {
 	list-style: none;
 }
 
-#system-stats {
+#footer {
+	color : #000;
+	margin: 0;
+	padding: 0.1em;
+	padding-left : 0.5em;
 	position: relative;
 	margin-top: 25px;
 	margin-right: 10px;
-	width: 900px;
+	width: 690px;
 	font-size: 0.6em;
 	text-align: right;
+}
+
+#footer a, #footer a:hover {
+	color : #000;
+	text-decoration : none;
+}
+
+#footer a:hover {
+	text-decoration : underline;
 }
 
 .clear {
 	clear: both;
 }
+
+a.current {
+	font-weight : bold;
+}
+
+

@@ -15,7 +15,7 @@
 	 *
 	 * @package Sjonsite
 	 */
-	class Sjonsite_Controller {
+	abstract class Sjonsite_Controller {
 
 		/**
 		 * Resource object
@@ -25,12 +25,34 @@
 		protected $resource;
 
 		/**
+		 * Revision object
+		 *
+		 * @var Sjonsite_Revision
+		 */
+		protected $revision;
+
+		/**
 		 * Constructor
 		 *
 		 * @param Sjonsite_Resource $resource
 		 */
-		public function __construct ($resource) {
+		public function __construct ($resource, $revision) {
 			$this->resource = $resource;
+			$this->revision = $revision;
+		}
+
+		/**
+		 * Disables global output caching
+		 *
+		 * @param bool $disabled;
+		 * @return bool
+		 */
+		public function cacheDisabled ($disabled = null) {
+			static $cacheDisabled = false;
+			if (!is_null($disabled)) {
+				$cacheDisabled = $disabled;
+			}
+			return $cacheDisabled;
 		}
 
 		/**
@@ -39,10 +61,7 @@
 		 *
 		 * @return void
 		 */
-		public function processRequest () {
-			var_dump($this->resource);
-			throw new Sjonsite_ControllerException('Base class cannot process requests ' . $this->resource->controller, 3001);
-		}
+		abstract public function processRequest ();
 
 	}
 

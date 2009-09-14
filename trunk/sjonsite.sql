@@ -42,9 +42,12 @@ CREATE TABLE IF NOT EXISTS `sjonsite_revisions` (
 	`short` varchar(64) NOT NULL,
 	`title` varchar(255) NOT NULL,
 	`content` mediumtext,
+	`state` enum('A','S','R','U') NOT NULL default 'U',
 	PRIMARY KEY (`id`),
 	KEY `resource_idx` (`resource`),
-	KEY `uri_idx` (`uri`)
+	KEY `revision_idx` (`revision`),
+	KEY `uri_idx` (`uri`),
+	KEY `state_idx` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 DROP TABLE IF EXISTS `sjonsite_settings`;
