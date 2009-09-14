@@ -10,11 +10,9 @@
 	 * @version $Id$
 	 */
 
-	$this->template('include/menu');
 ?>
-			<div class="clear">
-			</div>
-			<p id="system-stats">time: <?php printf('%0.1fms', (microtime(true) - SJONSITE_START) * 1000); ?> memory: <?php printf('%d KiB', memory_get_usage() / 1024); ?></p>
+			<div class="clear"></div>
+			<p id="footer">&copy; <?php echo date('Y'); ?> Sjonsite Inc. All Rights Reserved &ndash; <a href="/login">login</a></p>
 		</div>
 	</body>
 </html>

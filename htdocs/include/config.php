@@ -87,6 +87,16 @@
 	}
 
 	/**
+	 * The global time-to-live, in seconds
+	 * Low traffic sites can leave this at -1 for full freshness,
+	 * whereas a higher number introduces more staleness.
+	 * Set to zero to cache indefinitely
+	 */
+	if (!defined('SJONSITE_TTL')) {
+		define ('SJONSITE_TTL', 60);
+	}
+
+	/**
 	 * Autoload
 	 *
 	 * @param string $className
@@ -125,9 +135,21 @@
 
 	}
 
-	function sjonsite_exception_error_handler ($errno, $errstr, $errfile, $errline) {
+	/**
+	 * Error handler function which throws an ErrorException
+	 * @param int $errno
+	 * @param string $errstr
+	 * @param string $errfile
+	 * @param int $errline
+	 * @return void
+	 * @throws ErrorException
+	 */
+	function sjonsite_error_handler ($errno, $errstr, $errfile, $errline) {
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 
-	set_error_handler('sjonsite_exception_error_handler');
+	/**
+	 * Install error handler
+	 */
+	set_error_handler('sjonsite_error_handler');
 
