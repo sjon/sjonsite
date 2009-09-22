@@ -129,6 +129,7 @@
 			if (array_key_exists($name, $this->_structure)) {
 				if (!is_null($value)) {
 					list($type, $config) = $this->_structure[$name];
+					if (!array_key_exists('options', $config)) $config['options'] = null;
 					switch ($type) {
 						case 'int':
 							$value = filter_var($value, FILTER_VALIDATE_INT, array('options' => array('min_range' => $config['min'], 'max_range' => $config['max'])));

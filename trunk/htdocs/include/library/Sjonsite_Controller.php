@@ -63,6 +63,18 @@
 		 */
 		abstract public function processRequest ();
 
+		/**
+		 * Display a Template file
+		 *
+		 * @param string $template
+		 * @return void
+		 */
+		protected function displayTemplate ($template) {
+			ob_start();
+			include $template;
+			Sjonsite::$request->setContent(ob_get_clean());
+		}
+
 	}
 
 	/**

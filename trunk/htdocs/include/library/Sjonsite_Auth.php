@@ -113,12 +113,13 @@
 			$res = Sjonsite::$db->prepare($sql);
 			if ($res->execute(array(
 				':email' => Sjonsite::$io->post($user),
-				':passwd' => Sjonsite::$io->post($pass)
+				':passwd' => sha1(Sjonsite::$io->post($pass))
 			))) {
 				$row = $res->fetch(PDO::FETCH_ASSOC);
 				if (is_array($row) && isset($row['id'])) {
 					foreach ($row as $k => $v) {
 						$this->user->$k = $v;
+						$_SESSION['authUser'][$k] = $v;
 					}
 				}
 			}

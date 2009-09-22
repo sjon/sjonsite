@@ -49,8 +49,11 @@
 		 */
 		public static function set (Sjonsite_Cache_Data $cacheData) {
 			self::$hits--;
-			$filename = SJONSITE_INCLUDE . '/cache/' . sha1($cacheData->getToken());
-			return (bool) file_put_contents($filename, serialize($cacheData->getData()), LOCK_EX);
+			if ($cacheData->getTtl() > -1) {
+				$filename = SJONSITE_INCLUDE . '/cache/' . sha1($cacheData->getToken());
+				return (bool) file_put_contents($filename, serialize($cacheData->getData()), LOCK_EX);
+			}
+			return false;
 		}
 
 		/**
@@ -132,6 +135,15 @@
 		 */
 		public function setData ($data) {
 			$this->data = $data;
+		}
+
+		/**
+		 * Return the ttl
+		 *
+		 * @return int
+		 */
+		public function getTtl () {
+			return $this->ttl;
 		}
 
 		/**

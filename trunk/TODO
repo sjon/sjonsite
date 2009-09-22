@@ -48,3 +48,18 @@ Thoughts & Scribbles:
 		id, typeNNid
 
 
+Add resources + empty revisions:
+	/login
+	/system
+	/system/user
+	/system/resource
+	/system/revision
+	/system/settings
+	/system/upload
+	/logout
+
+Public controllers:
+	resource
+	contact
+	search
+

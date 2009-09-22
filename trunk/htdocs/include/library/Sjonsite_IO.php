@@ -389,6 +389,20 @@
 		}
 
 		/**
+		 * Return the value from a parameter from $_SERVER
+		 *
+		 * @param string $name
+		 * @param mixed $default
+		 * @return mixed
+		 */
+		public static function server ($name, $default = null) {
+			if (filter_has_var(INPUT_SERVER, $name)) {
+				return filter_input(INPUT_SERVER, $name, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+			}
+			return $default;
+		}
+
+		/**
 		 * Returns true if $email is a valid address
 		 *
 		 * @param string $email

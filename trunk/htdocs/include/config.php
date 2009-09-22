@@ -93,7 +93,7 @@
 	 * Set to zero to cache indefinitely
 	 */
 	if (!defined('SJONSITE_TTL')) {
-		define ('SJONSITE_TTL', 60);
+		define ('SJONSITE_TTL', -1);
 	}
 
 	/**

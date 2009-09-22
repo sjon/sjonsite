@@ -40,3 +40,6 @@
 	</head>
 	<body>
 		<div id="container">
+<?php
+	include 'messages.php';
+?>
