@@ -17,5 +17,15 @@
 	 */
 	class Sjonsite_UserController extends Sjonsite_Controller {
 
+		public function processRequest () {
+			$this->cacheDisabled(true);
+			if (Sjonsite::$auth->isAuthorized(Sjonsite_Auth::ROLE_ADMINISTRATOR, Sjonsite_Auth::ACT_LIST)) {
+				Sjonsite::$request->setContent('OK');
+				return;
+			}
+			Sjonsite::setMessage('You are not authorized', Sjonsite::error);
+			Sjonsite::$request->setRedirect('/login');
+		}
+
 	}
 

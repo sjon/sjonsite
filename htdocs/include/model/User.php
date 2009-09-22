@@ -58,9 +58,9 @@
 		protected $_structure = array(
 			'id' => array('int', array('min' => 0, 'max' => 1000)),
 			'name' => array('string', array('type' => 'any', 'length' => 255)),
-			'email' => array('string', array('type' => 'email', 'length' => 255)),
+			'email' => array('string', array('type' => FILTER_VALIDATE_EMAIL, 'length' => 255)),
 			'passwd' => array('string', array('type' => 'any', 'length' => 40)),
-			'level' => array('int', array('min' => 0, 'max' => 128)),
+			'level' => array('int', array('min' => 0, 'max' => 1024)),
 			'state' => array('enum', array('items' => array('A','S','R','U'), 'default' => 'U'))
 		);
 

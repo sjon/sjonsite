@@ -20,6 +20,7 @@
 	 */
 	try {
 		Sjonsite::init();
+		$guestRequest = null;
 		if (!Sjonsite::$io->isPost() && Sjonsite::$auth->isGuest()) {
 			$guestRequest = Sjonsite_Cache::get('guest-request-' . Sjonsite::$io->requestUri() . '-' . Sjonsite::$io->requestType(), SJONSITE_TTL);
 			if ($guestRequest->isValid()) {
@@ -34,6 +35,10 @@
 		$resource = $res->fetchColumn();
 		$res = null;
 		if (!is_numeric($resource)) {
+			// check for system resource
+			//$uri = explode('/', Sjonsite::$io->requestUri());
+			//if (in_array($uri[1], array('login', 'logout', 'settings', 'system', 'upload', 'user'), true)) {
+			//}
 			Sjonsite::$io->throwError(404);
 		}
 		$resource = new Sjonsite_Resource($resource);

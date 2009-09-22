@@ -45,7 +45,7 @@
 		 * @param array $driver_options
 		 * @return PDOStatement
 		 */
-		public function prepare ($statement, $driver_options = null) {
+		public function prepare ($statement, $driver_options = array()) {
 			self::$hits++;
 			return parent::prepare(str_replace('%prefix%', SJONSITE_PDO_PREFIX, $statement), $driver_options);
 		}

@@ -17,5 +17,16 @@
 	 */
 	class Sjonsite_LogoutController extends Sjonsite_Controller {
 
+		/**
+		 * Process Login Request
+		 *
+		 * @return void
+		 */
+		public function processRequest () {
+			$this->cacheDisabled(true);
+			session_destroy();
+			Sjonsite::$request->setRedirect('/');
+		}
+
 	}
 

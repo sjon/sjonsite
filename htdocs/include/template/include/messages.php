@@ -10,14 +10,14 @@
 	 * @version $Id$
 	 */
 
-	if ($this->hasMessage()) {
+	if (Sjonsite::hasMessage()) {
 ?>
 				<div id="messages">
 					<ul>
 <?php
-		while ($msg = $this->getMessage()) {
+		while ($msg = Sjonsite::getMessage()) {
 ?>
-						<li class="<?php echo $msg[1]; ?>"><?php echo $this->out($msg[0], true); ?></li>
+						<li class="<?php echo $msg[1]; ?>"><?php echo Sjonsite::$io->out($msg[0], true); ?></li>
 <?php
 		}
 ?>
