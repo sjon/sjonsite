@@ -1,21 +1,21 @@
 <?php
 
-	/**
-	 * Sjonsite Template - Admin Pages
-	 *
-	 * @author Sjon <sjonscom@gmail.com>
-	 * @package Sjonsite
-	 * @copyright Sjon's dotCom 2008
-	 * @license Mozilla Public License 1.1
-	 * @version $Id$
-	 */
+/**
+ * Sjonsite Template - Admin Pages
+ *
+ * @author Sjon <sjonscom@gmail.com>
+ * @package Sjonsite
+ * @copyright Sjon's dotCom 2008
+ * @license Mozilla Public License 1.1
+ * @version $Id$
+ */
 
-	$this->template('include/header');
+$this->template('include/header');
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
 <?php
-	$this->template('include/messages');
+$this->template('include/messages');
 ?>
 				<div class="list">
 					<table summary="List of pages">
@@ -37,50 +37,50 @@
 						</tfoot>
 						<tbody>
 <?php
-	if (count($this->pagesList) > 0) {
-		$even = false;
-		foreach ($this->pagesList as $page) {
+if (count($this->pagesList) > 0) {
+    $even = false;
+    foreach ($this->pagesList as $page) {
 ?>
 							<tr class="<?php echo $even ? 'even' : 'odd'; $even = !$even; ?>">
 								<td><?php echo str_repeat('&nbsp;&nbsp;&nbsp;', $page->indent), $this->out($page->p_title); ?></td>
 								<td class="center">
 <?php
-			if ($page->p_gallery > 0) {
+        if ($page->p_gallery > 0) {
 ?>
 									<img src="/img/admin/page-gallery.png" title="This is a gallery page" alt="Gallery" />
 <?php
-			}
-			else {
+        }
+        else {
 ?>
 									<img src="/img/admin/page-content.png" title="This is a content page" alt="Content" />
 <?php
-			}
+        }
 ?>
 								</td>
 								<td class="center">
 <?php
-			switch ($page->p_state) {
-				case Sjonsite_Model::ACTIVE:
+        switch ($page->p_state) {
+            case Sjonsite_Model::ACTIVE:
 ?>
 									<img src="/img/admin/system-state-a.png" title="This page is active" alt="This page is active" />
 <?php
-					break;
-				case Sjonsite_Model::SUSPENDED:
+                break;
+            case Sjonsite_Model::SUSPENDED:
 ?>
 									<img src="/img/admin/system-state-s.png" title="This page is suspended" alt="This page is suspended" />
 <?php
-					break;
-				case Sjonsite_Model::REMOVED:
+                break;
+            case Sjonsite_Model::REMOVED:
 ?>
 									<img src="/img/admin/system-state-r.png" title="This page is removed" alt="This page is removed" />
 <?php
-					break;
-				default:
+                break;
+            default:
 ?>
 									<img src="/img/admin/system-state-u.png" title="Unknown state for this page" alt="Unknown state for this page" />
 <?php
-					break;
-			}
+                break;
+        }
 ?>
 								</td>
 								<td class="center">
@@ -94,38 +94,38 @@
 									&nbsp;
 									<a href="/admin/pages/add?p_pid=<?php echo $this->out($page->p_id); ?>" title="Add a child page to &lsquo;<?php echo $this->out($page->p_title); ?>&rsquo;"><img src="/img/admin/page-add-child.png" alt="add child" /></a>
 <?php
-			if ($page->p_gallery > 0) {
+        if ($page->p_gallery > 0) {
 ?>
 									<!--img src="/img/admin/not-available.png" alt="" /-->
 									<a href="/admin/gallery/add/<?php echo $this->out($page->p_gallery); ?>" title="Add images to this gallery"><img src="/img/admin/gallery-add.png" alt="add" /></a>
 <?php
-			}
-			else {
+        }
+        else {
 ?>
 									<!--a href="/admin/images/add/<?php echo $this->out($page->p_id); ?>" title="Add images to this page"><img src="/img/admin/gallery-add.png" alt="add" /></a-->
 									<img src="/img/admin/not-available.png" alt="" />
 <?php
-			}
+        }
 ?>
 									&nbsp;
 									<a href="<?php echo $this->out($page->p_uri); ?>" class="preview" title="View this page"><img src="/img/admin/page-preview.png" alt="view" /></a>
 								</td>
 							</tr>
 <?php
-		}
-	}
-	else {
+    }
+}
+else {
 ?>
 							<tr>
 								<td colspan="6">No pages found</td>
 							</tr>
 <?php
-	}
+}
 ?>
 						</tbody>
 					</table>
 				</div>
 			</div>
 <?php
-	$this->template('include/footer');
+$this->template('include/footer');
 ?>

@@ -1,21 +1,21 @@
 <?php
 
-	/**
-	 * Sjonsite Template - Admin Users
-	 *
-	 * @author Sjon <sjonscom@gmail.com>
-	 * @package Sjonsite
-	 * @copyright Sjon's dotCom 2008
-	 * @license Mozilla Public License 1.1
-	 * @version $Id$
-	 */
+/**
+ * Sjonsite Template - Admin Users
+ *
+ * @author Sjon <sjonscom@gmail.com>
+ * @package Sjonsite
+ * @copyright Sjon's dotCom 2008
+ * @license Mozilla Public License 1.1
+ * @version $Id$
+ */
 
-	$this->template('include/header');
+$this->template('include/header');
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
 <?php
-	$this->template('include/messages');
+$this->template('include/messages');
 ?>
 				<div class="list">
 					<table summary="List of users">
@@ -36,81 +36,81 @@
 						</tfoot>
 						<tbody>
 <?php
-	if (count($this->usersList) > 0) {
-		$even = false;
-		foreach ($this->usersList as $user) {
+if (count($this->usersList) > 0) {
+    $even = false;
+    foreach ($this->usersList as $user) {
 ?>
 							<tr class="<?php echo $even ? 'even' : 'odd'; $even = !$even; ?>">
 								<td><?php echo $this->out($user->u_name); ?></td>
 								<td><?php echo $this->out($user->u_email); ?></td>
 								<td class="center">
 <?php
-			if (($user->u_level & 1) == 1) {
+        if (($user->u_level & 1) == 1) {
 ?>
 									<img src="/img/admin/user-level-1.png" title="Can manage pages" alt="Can manage pages" />
 <?php
-			}
-			else {
+        }
+        else {
 ?>
 									<img src="/img/admin/not-available.png" alt="" />
 <?php
-			}
-			if (($user->u_level & 2) == 2) {
+        }
+        if (($user->u_level & 2) == 2) {
 ?>
 									<img src="/img/admin/user-level-2.png" title="Can manage gallery" alt="Can manage gallery" />
 <?php
-			}
-			else {
+        }
+        else {
 ?>
 									<img src="/img/admin/not-available.png" alt="" />
 <?php
-			}
-			if (($user->u_level & 4) == 4) {
+        }
+        if (($user->u_level & 4) == 4) {
 ?>
 									<img src="/img/admin/user-level-4.png" title="Can manage users" alt="Can manage users" />
 <?php
-			}
-			else {
+        }
+        else {
 ?>
 									<img src="/img/admin/not-available.png" alt="" />
 <?php
-			}
-			if (($user->u_level & 8) == 8) {
+        }
+        if (($user->u_level & 8) == 8) {
 ?>
 									<img src="/img/admin/user-level-8.png" title="Can manage settings" alt="Can manage settings" />
 <?php
-			}
-			else {
+        }
+        else {
 ?>
 									<img src="/img/admin/not-available.png" alt="" />
 <?php
-			}
+        }
 ?>
 								</td>
 								<td class="center">
 <?php
-			switch ($user->u_state) {
-				case Sjonsite_Model::ACTIVE:
+        switch ($user->u_state) {
+            case Sjonsite_Model::ACTIVE:
 ?>
 									<img src="/img/admin/system-state-a.png" title="This user is active" alt="This user is active" />
 <?php
-					break;
-				case Sjonsite_Model::SUSPENDED:
+                break;
+            case Sjonsite_Model::SUSPENDED:
 ?>
 									<img src="/img/admin/system-state-s.png" title="This user is suspended" alt="This user is suspended" />
 <?php
-					break;
-				case Sjonsite_Model::REMOVED:
+                break;
+            case Sjonsite_Model::REMOVED:
 ?>
 									<img src="/img/admin/system-state-r.png" title="This user is removed" alt="This user is removed" />
 <?php
-					break;
-				default:
+                break;
+            default:
 ?>
 									<img src="/img/admin/system-state-u.png" title="Unknown state for this user" alt="Unknown state for this user" />
 <?php
-					break;
-			}
+                break;
+        }
 ?>
 								</td>
 								<td>
@@ -119,20 +119,20 @@
 								</td>
 							</tr>
 <?php
-		}
-	}
-	else {
+    }
+}
+else {
 ?>
 							<tr>
 								<td colspan="5">No users found</td>
 							</tr>
 <?php
-	}
+}
 ?>
 						</tbody>
 					</table>
 				</div>
 			</div>
 <?php
-	$this->template('include/footer');
+$this->template('include/footer');
 ?>

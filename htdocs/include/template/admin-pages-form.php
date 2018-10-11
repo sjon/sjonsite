@@ -1,25 +1,25 @@
 <?php
 
-	/**
-	 * Sjonsite Template - Admin Pages Form
-	 *
-	 * @author Sjon <sjonscom@gmail.com>
-	 * @package Sjonsite
-	 * @copyright Sjon's dotCom 2008
-	 * @license Mozilla Public License 1.1
-	 * @version $Id$
-	 */
+/**
+ * Sjonsite Template - Admin Pages Form
+ *
+ * @author Sjon <sjonscom@gmail.com>
+ * @package Sjonsite
+ * @copyright Sjon's dotCom 2008
+ * @license Mozilla Public License 1.1
+ * @version $Id$
+ */
 
-	$this->template('include/header');
+$this->template('include/header');
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
 <?php
-	$this->template('include/messages');
+$this->template('include/messages');
 ?>
 				<div class="form">
 <?php
-	if (empty($this->pageformData->p_id)) {
+if (empty($this->pageformData->p_id)) {
 ?>
 					<form action="/admin/pages/add" method="post">
 						<fieldset>
@@ -48,8 +48,8 @@
 						</div>
 					</form>
 <?php
-	}
-	else {
+}
+else {
 ?>
 					<form action="/admin/pages/<?php echo $this->formAction; ?>" method="post">
 						<fieldset>
@@ -74,7 +74,7 @@
 							</div>
 						</fieldset>
 <?php
-		if ($this->pageformData->p_gallery > 0) {
+    if ($this->pageformData->p_gallery > 0) {
 ?>
 						<fieldset>
 							<legend>Gallery Page</legend>
@@ -94,8 +94,8 @@
 							<input type="hidden" name="p_content" value="null" />
 						</fieldset>
 <?php
-		}
-		else {
+    }
+    else {
 ?>
 						<fieldset>
 							<legend>Content Page</legend>
@@ -120,7 +120,7 @@
 							</div>
 						</fieldset>
 <?php
-		}
+    }
 ?>
 						<div class="buttons">
 							<button type="submit" class="edit">
@@ -129,10 +129,10 @@
 						</div>
 					</form>
 <?php
-	}
+}
 ?>
 				</div>
 			</div>
 <?php
-	$this->template('include/footer');
+$this->template('include/footer');
 ?>

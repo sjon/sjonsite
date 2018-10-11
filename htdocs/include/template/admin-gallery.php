@@ -1,21 +1,21 @@
 <?php
 
-	/**
-	 * Sjonsite Template - Admin Gallery
-	 *
-	 * @author Sjon <sjonscom@gmail.com>
-	 * @package Sjonsite
-	 * @copyright Sjon's dotCom 2008
-	 * @license Mozilla Public License 1.1
-	 * @version $Id$
-	 */
+/**
+ * Sjonsite Template - Admin Gallery
+ *
+ * @author Sjon <sjonscom@gmail.com>
+ * @package Sjonsite
+ * @copyright Sjon's dotCom 2008
+ * @license Mozilla Public License 1.1
+ * @version $Id$
+ */
 
-	$this->template('include/header');
+$this->template('include/header');
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
 <?php
-	$this->template('include/messages');
+$this->template('include/messages');
 ?>
 				<div class="list">
 					<table summary="List of gallery pages">
@@ -34,9 +34,9 @@
 						</tfoot>
 						<tbody>
 <?php
-	if (count($this->galleryList) > 0) {
-		$even = false;
-		foreach ($this->galleryList as $gallery) {
+if (count($this->galleryList) > 0) {
+    $even = false;
+    foreach ($this->galleryList as $gallery) {
 ?>
 							<tr class="<?php echo $even ? 'even' : 'odd'; $even = !$even; ?>">
 								<td><?php echo $this->out($gallery->g_title); ?></td>
@@ -50,20 +50,20 @@
 								</td>
 							</tr>
 <?php
-		}
-	}
-	else {
+    }
+}
+else {
 ?>
 							<tr>
 								<td colspan="4">No gallery found</td>
 							</tr>
 <?php
-	}
+}
 ?>
 						</tbody>
 					</table>
 				</div>
 			</div>
 <?php
-	$this->template('include/footer');
+$this->template('include/footer');
 ?>
