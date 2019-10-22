@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `sjonsite_resources` (
     KEY `parent_idx` (`parent`),
     KEY `sorting_idx` (`sorting`),
     KEY `state_idx` (`state`)
-  ) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS `sjonsite_revisions`;
 CREATE TABLE IF NOT EXISTS `sjonsite_revisions` (
@@ -50,14 +50,14 @@ CREATE TABLE IF NOT EXISTS `sjonsite_revisions` (
     KEY `revision_idx` (`revision`),
     KEY `uri_idx` (`uri`),
     KEY `state_idx` (`state`)
-  ) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS `sjonsite_settings`;
 CREATE TABLE IF NOT EXISTS `sjonsite_settings` (
     `name` varchar(128) NOT NULL,
     `value` blob,
     PRIMARY KEY (`name`)
-  ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 DROP TABLE IF EXISTS `sjonsite_users`;
 CREATE TABLE IF NOT EXISTS `sjonsite_users` (
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `sjonsite_users` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `email_idx` (`email`),
     KEY `state_idx` (`state`)
-  ) ENGINE = InnoDB DEFAULT CHARSET = utf8 AUTO_INCREMENT = 1;
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 AUTO_INCREMENT = 1;
 
 ALTER TABLE
   `sjonsite_resources`
