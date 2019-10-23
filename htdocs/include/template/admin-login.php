@@ -1,27 +1,27 @@
 <?php
 
-	/**
-	 * Sjonsite Template - Admin Login
-	 *
-	 * @author Sjon <sjonscom@gmail.com>
-	 * @package Sjonsite
-	 * @copyright Sjon's dotCom 2008
-	 * @license Mozilla Public License 1.1
-	 * @version $Id$
-	 */
+/**
+ * Sjonsite Template - Admin Login
+ *
+ * @author Sjon <sjonscom@gmail.com>
+ * @package Sjonsite
+ * @copyright Sjon's dotCom 2008
+ * @license Mozilla Public License 1.1
+ * @version $Id$
+ */
 
-	$this->template('include/header');
+$this->template('include/header');
 ?>
 			<div id="main">
 				<h1>Sjonsite Admin</h1>
 <?php
-	$this->template('include/messages');
-	if ($_SESSION['adminFlag']) {
+$this->template('include/messages');
+if ($_SESSION['adminFlag']) {
 ?>
 				<p>You don't have enough privileges to view this page.</p>
 <?php
-	}
-	else {
+}
+else {
 ?>
 				<div class="form">
 					<form action="/admin" method="post">
@@ -49,9 +49,9 @@
 					</form>
 				</div>
 <?php
-	}
+}
 ?>
 			</div>
 <?php
-	$this->template('include/footer');
+$this->template('include/footer');
 ?>
